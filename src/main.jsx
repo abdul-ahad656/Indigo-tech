@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
+import Hero3DLogo from "./components/Hero3DLogo";
 import {
   ArrowDown, ArrowUp, ArrowUpRight, BriefcaseBusiness, CheckCircle2,
   ChevronRight, Clock3, ExternalLink, Headphones, Mail, MapPin, Menu,
@@ -113,8 +114,6 @@ function Reveal({ children, delay = 0, className = "" }) {
 
 function App() {
   const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -90]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.18], [1, 0.94]);
   const [open, setOpen] = React.useState(false);
 
   const go = (id) => {
@@ -147,33 +146,22 @@ function App() {
       </nav>
 
       <main id="top">
-        <section className="hero">
-          <div className="hero-grid" />
-          <div className="hero-glow glow-one" />
-          <div className="hero-glow glow-two" />
-          <motion.div className="hero-inner" style={{ y: heroY, scale: heroScale }}>
-            <Reveal>
-              <div className="hero-logo-wrap">
-                <img src="/assets/indigo-logo.jpg" alt="Indigo Tech Solutions" className="hero-logo" />
-              </div>
-              <div className="eyebrow"><span className="live-dot" /> BPO · Operations · Technology-enabled services</div>
-              <h1>Smart solutions.<br/><span>Stronger businesses.</span></h1>
-              <p className="hero-copy">BPO · Logistics · Dispatch · Customer Support · Business Development</p>
-              <p className="hero-sub">
-                Indigo Tech Solutions helps businesses run smarter through dependable BPO,
-                logistics operations, customer support, sales and remote business services.
-              </p>
-              <div className="hero-actions">
-                <button className="primary" onClick={() => go("services")}>Explore services <ArrowDown size={18}/></button>
-                <a className="secondary" href={`mailto:${company.email}`}>Talk to Indigo <ArrowUpRight size={18}/></a>
-              </div>
-            </Reveal>
-          </motion.div>
-          <div className="hero-poster" aria-hidden="true">
-            <img src="/assets/company-banner.png" alt="" />
+        <Hero3DLogo>
+          <div className="hero-inner">
+            <div className="eyebrow"><span className="live-dot" /> BPO · Operations · Technology-enabled services</div>
+            <h1>Smart solutions.<br/><span>Stronger businesses.</span></h1>
+            <p className="hero-copy">BPO · Logistics · Dispatch · Customer Support · Business Development</p>
+            <p className="hero-sub">
+              Indigo Tech Solutions helps businesses run smarter through dependable BPO,
+              logistics operations, customer support, sales and remote business services.
+            </p>
+            <div className="hero-actions">
+              <button className="primary" onClick={() => go("services")}>Explore services <ArrowDown size={18}/></button>
+              <a className="secondary" href={`mailto:${company.email}`}>Talk to Indigo <ArrowUpRight size={18}/></a>
+            </div>
           </div>
           <div className="scroll-cue"><span>SCROLL TO EXPLORE</span><div /></div>
-        </section>
+        </Hero3DLogo>
 
         <section className="ticker" aria-label="Indigo services">
           {[...capabilities, ...capabilities].map((x, i) => <span key={i}>{x}<b>✦</b></span>)}
