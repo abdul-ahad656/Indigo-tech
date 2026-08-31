@@ -1,0 +1,20 @@
+CUSTOM DOMAIN CHECKLIST
+
+Recommended domain style:
+- hafizabdullahather.com
+- abdullahather.com
+- hafizather.com
+
+Before buying a domain, check availability at your preferred registrar.
+
+Deployment:
+1. Push the project to GitHub.
+2. Import it into Vercel (or use GitHub Pages).
+3. Add the domain inside the hosting dashboard FIRST.
+4. Add the DNS records shown by the host at your domain registrar.
+5. Verify DNS.
+6. Turn on HTTPS.
+7. Test both the root domain and www version.
+
+Do not copy random DNS values from tutorials. Use the exact records shown by your
+current hosting provider because hosting infrastructure can change.
