@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { motion, useScroll } from "framer-motion";
 import Hero3DLogo from "./components/Hero3DLogo";
+import LoadingScreen from "./components/LoadingScreen";
 import {
   ArrowDown, ArrowUp, BriefcaseBusiness, ChevronRight, Clock3, Globe,
   Headphones, Mail, MapPin, MessageCircle, Phone, Route, ShieldCheck,
@@ -391,4 +392,17 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+function Root() {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <>
+      {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
+      <div className={loading ? "site site--loading" : "site"} aria-hidden={loading}>
+        <App />
+      </div>
+    </>
+  );
+}
+
+createRoot(document.getElementById("root")).render(<Root />);
