@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Component, Suspense, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, useProgress } from "@react-three/drei";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -62,6 +62,7 @@ function Lights() {
 function IndigoMark({ triggerRef, onReady }) {
   const { scene } = useGLTF(MODEL_PATH);
   const { viewport } = useThree();
+  const spinRef = useRef(null);
   const mark = useMemo(() => {
     const group = new THREE.Group();
     scene.children.forEach((child) => group.add(child.clone(true)));
@@ -75,6 +76,17 @@ function IndigoMark({ triggerRef, onReady }) {
   }, [onReady]);
 
   useLayoutEffect(() => {
+    if (spinRef.current) spinRef.current.rotation.set(0.08, -0.38, 0);
+  }, []);
+
+  useFrame((_, delta) => {
+    const group = spinRef.current;
+    if (!group) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    group.rotation.y += delta * 0.22;
+  });
+
+  useLayoutEffect(() => {
     const trigger = triggerRef?.current;
     if (!trigger || !mark) return;
 
@@ -84,57 +96,25 @@ function IndigoMark({ triggerRef, onReady }) {
     const originals = [];
 
     const ctx = gsap.context(() => {
-      if (prefersReduced || !chipsGroup) return;
+      if (prefersReduced) return;
 
       const chips = [];
-      for (let i = 1; i <= 17; i += 1) {
-        const named = chipsGroup.getObjectByName(`chip-${i}`);
-        if (named) chips.push(named);
-      }
-      if (!chips.length) {
-        chipsGroup.traverse((child) => {
-          if (child.isMesh) chips.push(child);
-        });
-      }
-
-      chips.forEach((chip) => {
-        originals.push({
-          mesh: chip,
-          x: chip.position.x,
-          y: chip.position.y,
-          z: chip.position.z,
-          rx: chip.rotation.x,
-          ry: chip.rotation.y,
-          rz: chip.rotation.z,
-        });
-      });
-
-      const tl = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: {
-          trigger,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      if (ring) {
-        const sx = ring.scale.x;
-        const sy = ring.scale.y;
-        const sz = ring.scale.z;
-        tl.to(ring.scale, { x: sx * 1.08, y: sy * 1.08, z: sz * 1.08, duration: 0.5, ease: "power2.out" }, 0);
-        tl.to(ring.rotation, { y: 0.28, z: 0.1, duration: 0.5, ease: "power2.out" }, 0);
-        tl.to(ring.scale, { x: sx, y: sy, z: sz, duration: 0.5, ease: "power2.inOut" }, 0.5);
-        tl.to(ring.rotation, { y: 0, z: 0, duration: 0.5, ease: "power2.inOut" }, 0.5);
+      if (chipsGroup) {
+        for (let i = 1; i <= 17; i += 1) {
+          const named = chipsGroup.getObjectByName(`chip-${i}`);
+          if (named) chips.push(named);
+        }
+        if (!chips.length) {
+          chipsGroup.traverse((child) => {
+            if (child.isMesh) chips.push(child);
+          });
+        }
       }
 
-      originals.forEach((orig, i) => {
-        const { mesh, x, y, z, rx, ry, rz } = orig;
-        let dx = x;
-        let dy = y;
-        let dz = z;
+      chips.forEach((chip, i) => {
+        let dx = chip.position.x;
+        let dy = chip.position.y;
+        let dz = chip.position.z;
         const len = Math.hypot(dx, dy, dz);
         if (len < 1e-6) {
           dx = rand(i + 1) - 0.5;
@@ -145,23 +125,74 @@ function IndigoMark({ triggerRef, onReady }) {
         dx *= inv;
         dy *= inv;
         dz *= inv;
-
         const dist = 1.55 + rand(i + 21) * 1.9;
-        const exploded = {
-          x: x + dx * dist,
-          y: y + dy * dist,
-          z: z + dz * dist + (rand(i + 33) - 0.32) * 1.7,
-        };
-        const explodedRot = {
-          x: rx + (rand(i + 41) - 0.5) * Math.PI * 1.2,
-          y: ry + (rand(i + 52) - 0.5) * Math.PI * 1.4,
-          z: rz + (rand(i + 63) - 0.5) * Math.PI * 0.95,
-        };
 
-        tl.to(mesh.position, { ...exploded, duration: 0.5, ease: "power2.out" }, 0);
-        tl.to(mesh.rotation, { ...explodedRot, duration: 0.5, ease: "power2.out" }, 0);
-        tl.to(mesh.position, { x, y, z, duration: 0.5, ease: "power2.inOut" }, 0.5);
-        tl.to(mesh.rotation, { x: rx, y: ry, z: rz, duration: 0.5, ease: "power2.inOut" }, 0.5);
+        originals.push({
+          type: "chip",
+          mesh: chip,
+          x: chip.position.x,
+          y: chip.position.y,
+          z: chip.position.z,
+          rx: chip.rotation.x,
+          ry: chip.rotation.y,
+          rz: chip.rotation.z,
+          ex: chip.position.x + dx * dist,
+          ey: chip.position.y + dy * dist,
+          ez: chip.position.z + dz * dist + (rand(i + 33) - 0.32) * 1.7,
+        });
+      });
+
+      let ringState = null;
+      if (ring) {
+        ringState = {
+          type: "ring",
+          mesh: ring,
+          sx: ring.scale.x,
+          sy: ring.scale.y,
+          sz: ring.scale.z,
+        };
+        originals.push(ringState);
+      }
+
+      const restore = () => {
+        originals.forEach((orig) => {
+          if (orig.type === "chip") orig.mesh.position.set(orig.x, orig.y, orig.z);
+          if (orig.type === "ring") orig.mesh.scale.set(orig.sx, orig.sy, orig.sz);
+        });
+      };
+
+      const apply = (t) => {
+        const burst = Math.sin(Math.PI * t);
+        const k = burst * burst * (3 - 2 * burst);
+
+        originals.forEach((orig) => {
+          if (orig.type !== "chip") return;
+          orig.mesh.position.set(
+            orig.x + (orig.ex - orig.x) * k,
+            orig.y + (orig.ey - orig.y) * k,
+            orig.z + (orig.ez - orig.z) * k
+          );
+        });
+
+        if (ringState) {
+          const s = 1 + 0.1 * k;
+          ringState.mesh.scale.set(ringState.sx * s, ringState.sy * s, ringState.sz * s);
+        }
+      };
+
+      const progress = { t: 0 };
+      gsap.to(progress, {
+        t: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.1,
+          onUpdate: (self) => apply(self.progress),
+          onLeave: restore,
+          onEnterBack: () => apply(1),
+        },
       });
     }, trigger);
 
@@ -173,15 +204,15 @@ function IndigoMark({ triggerRef, onReady }) {
       cancelAnimationFrame(refreshId);
       window.removeEventListener("resize", onResize);
       ctx.revert();
-      originals.forEach(({ mesh, x, y, z, rx, ry, rz }) => {
-        mesh.position.set(x, y, z);
-        mesh.rotation.set(rx, ry, rz);
+      originals.forEach((orig) => {
+        if (orig.type === "chip") orig.mesh.position.set(orig.x, orig.y, orig.z);
+        if (orig.type === "ring") orig.mesh.scale.set(orig.sx, orig.sy, orig.sz);
       });
     };
   }, [mark, triggerRef]);
 
   return (
-    <group scale={scale} position={[0, -0.32, 0]} rotation={[0.08, -0.38, 0]}>
+    <group ref={spinRef} scale={scale} position={[0, -0.32, 0]}>
       <primitive object={mark} />
     </group>
   );
