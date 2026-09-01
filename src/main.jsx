@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client";
 import { motion, useScroll } from "framer-motion";
 import Hero3DLogo from "./components/Hero3DLogo";
 import {
-  ArrowDown, ArrowUp, ArrowUpRight, BriefcaseBusiness, CheckCircle2,
-  ChevronRight, Clock3, ExternalLink, Headphones, Mail, MapPin, Menu,
-  MessageCircle, Phone, Route, Send, ShieldCheck, Target, Users, X, Zap
+  ArrowDown, ArrowUp, BriefcaseBusiness, ChevronRight, Clock3, Globe,
+  Headphones, Mail, MapPin, MessageCircle, Phone, Route, ShieldCheck,
+  Target, Users, Zap
 } from "lucide-react";
 import "./styles.css";
 
@@ -112,9 +112,48 @@ function Reveal({ children, delay = 0, className = "" }) {
   );
 }
 
+const heroWords = ["businesses.", "operations.", "outcomes."];
+
+function HeroWord() {
+  const [index, setIndex] = React.useState(0);
+  const reduced = React.useMemo(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    []
+  );
+
+  React.useEffect(() => {
+    if (reduced) return undefined;
+    const timer = setInterval(() => setIndex((value) => (value + 1) % heroWords.length), 2800);
+    return () => clearInterval(timer);
+  }, [reduced]);
+
+  return (
+    <span key={heroWords[index]} className="hero-word">
+      {heroWords[index]}
+    </span>
+  );
+}
+
 function App() {
   const { scrollYProgress } = useScroll();
   const [open, setOpen] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const close = (event) => {
+      if (!event.target.closest(".nav")) setOpen(false);
+    };
+    window.addEventListener("pointerdown", close);
+    return () => window.removeEventListener("pointerdown", close);
+  }, [open]);
 
   const go = (id) => {
     setOpen(false);
@@ -125,13 +164,25 @@ function App() {
     <div className="site">
       <motion.div className="progress" style={{ scaleX: scrollYProgress }} />
 
-      <nav className="nav">
+      <nav className={`nav ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""}`}>
         <button className="brand" onClick={() => go("top")} aria-label="Go home">
           <img src="/assets/indigo-logo.jpg" alt="Indigo Tech Solutions logo" />
-          <span>{company.name}</span>
+          <span>Indigo</span>
         </button>
 
-        <div className={`nav-links ${open ? "open" : ""}`}>
+        <div className="nav-end">
+          <button className="nav-talk" onClick={() => go("contact")}>Let's talk</button>
+          <button
+            className="nav-menu"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-label="Toggle menu"
+          >
+            {open ? "Close ×" : "Menu ="}
+          </button>
+        </div>
+
+        <div className={`nav-panel ${open ? "open" : ""}`}>
           {[
             ["about", "Company"], ["services", "Services"], ["team", "Team"],
             ["feedback", "Feedback"], ["contact", "Contact"]
@@ -139,28 +190,38 @@ function App() {
             <button key={id} onClick={() => go(id)}>{label}</button>
           ))}
         </div>
-
-        <button className="menu-btn" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-          {open ? <X size={22}/> : <Menu size={22}/>} 
-        </button>
       </nav>
 
       <main id="top">
         <Hero3DLogo>
-          <div className="hero-inner">
-            <div className="eyebrow"><span className="live-dot" /> BPO · Operations · Technology-enabled services</div>
-            <h1>Smart solutions.<br/><span>Stronger businesses.</span></h1>
-            <p className="hero-copy">BPO · Logistics · Dispatch · Customer Support · Business Development</p>
-            <p className="hero-sub">
-              Indigo Tech Solutions helps businesses run smarter through dependable BPO,
-              logistics operations, customer support, sales and remote business services.
-            </p>
-            <div className="hero-actions">
-              <button className="primary" onClick={() => go("services")}>Explore services <ArrowDown size={18}/></button>
-              <a className="secondary" href={`mailto:${company.email}`}>Talk to Indigo <ArrowUpRight size={18}/></a>
+          <div className="hero-overlay">
+            <h1 className="hero-headline">
+              Smart solutions.<br />
+              Stronger <HeroWord />
+            </h1>
+
+            <div className="hero-bottom">
+              <button className="hero-scroll" onClick={() => go("about")} aria-label="Scroll to about">
+                <ArrowDown size={16} />
+              </button>
+
+              <div className="hero-hint">
+                <span>Scroll to explode</span>
+                <span>Dare to watch the mark.</span>
+              </div>
+
+              <div className="hero-meta">
+                <div className="hero-est">
+                  <span className="hero-est-mark">
+                    <Globe size={15} />
+                    <b>Lahore</b>
+                  </span>
+                  <span>Remote operations. Reliable delivery.</span>
+                </div>
+                <p>BPO, logistics, dispatch, and customer support built for clarity, scale and impact.</p>
+              </div>
             </div>
           </div>
-          <div className="scroll-cue"><span>SCROLL TO EXPLORE</span><div /></div>
         </Hero3DLogo>
 
         <section className="ticker" aria-label="Indigo services">

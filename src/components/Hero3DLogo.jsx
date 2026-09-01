@@ -2,7 +2,7 @@
 
 import React, { Component, Suspense, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { ContactShadows, useGLTF, useProgress } from "@react-three/drei";
+import { useGLTF, useProgress } from "@react-three/drei";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
@@ -68,7 +68,7 @@ function IndigoMark({ triggerRef, onReady }) {
     return group;
   }, [scene]);
 
-  const scale = Math.max(0.95, Math.min(viewport.width || 4, viewport.height || 3) * 0.38);
+  const scale = Math.max(0.88, Math.min(viewport.width || 4, viewport.height || 3) * 0.33);
 
   useLayoutEffect(() => {
     onReady?.();
@@ -181,26 +181,30 @@ function IndigoMark({ triggerRef, onReady }) {
   }, [mark, triggerRef]);
 
   return (
-    <group scale={scale} position={[0, 0.15, 0]} rotation={[0.1, -0.38, 0]}>
+    <group scale={scale} position={[0, -0.32, 0]} rotation={[0.08, -0.38, 0]}>
       <primitive object={mark} />
     </group>
+  );
+}
+
+function HeroArcs() {
+  return (
+    <svg className="hero-arcs" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <ellipse cx="740" cy="470" rx="240" ry="180" />
+      <ellipse cx="740" cy="470" rx="340" ry="250" />
+      <ellipse cx="740" cy="480" rx="470" ry="320" />
+      <path d="M120 760 Q 740 90 1320 760" />
+      <path d="M40 640 Q 740 20 1400 640" />
+    </svg>
   );
 }
 
 function Scene({ triggerRef, onReady }) {
   return (
     <>
-      <color attach="background" args={["#f6f4fb"]} />
+      <color attach="background" args={["#ffffff"]} />
       <Lights />
       <IndigoMark triggerRef={triggerRef} onReady={onReady} />
-      <ContactShadows
-        position={[0, -1.2, 0]}
-        opacity={0.22}
-        scale={8}
-        blur={2.4}
-        far={3}
-        color="#351a92"
-      />
     </>
   );
 }
@@ -221,30 +225,33 @@ export default function Hero3DLogo({ children }) {
   return (
     <section ref={sectionRef} className="hero hero-3d" aria-label="Indigo 3D mark">
       <div className="hero-3d-stage">
-        <div className="hero-grid" />
-        <div className="hero-glow glow-one" />
-        <div className="hero-glow glow-two" />
+        <div className="hero-3d-frame">
+          <div className="hero-grid" />
+          <div className="hero-glow glow-one" />
+          <div className="hero-glow glow-two" />
+          <HeroArcs />
 
-        <HeroErrorBoundary fallback={<FallbackMark />}>
-          <div className="hero-3d-canvas-wrap">
-            <Canvas
-              className="hero-3d-canvas"
-              dpr={[1, 1.75]}
-              gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-              camera={{ position: [0, 0.05, 3.6], fov: 40, near: 0.1, far: 50 }}
-              style={{ width: "100%", height: "100%", display: "block" }}
-            >
-              <Suspense fallback={null}>
-                <Scene triggerRef={sectionRef} onReady={onReady} />
-              </Suspense>
-            </Canvas>
-            {!ready && <LoaderOverlay />}
-          </div>
-        </HeroErrorBoundary>
+          <HeroErrorBoundary fallback={<FallbackMark />}>
+            <div className="hero-3d-canvas-wrap">
+              <Canvas
+                className="hero-3d-canvas"
+                dpr={[1, 1.75]}
+                gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+                camera={{ position: [0, 0.12, 3.7], fov: 38, near: 0.1, far: 50 }}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
+              >
+                <Suspense fallback={null}>
+                  <Scene triggerRef={sectionRef} onReady={onReady} />
+                </Suspense>
+              </Canvas>
+              {!ready && <LoaderOverlay />}
+            </div>
+          </HeroErrorBoundary>
 
-        {!ready && <FallbackMark />}
+          {!ready && <FallbackMark />}
 
-        {children}
+          {children}
+        </div>
       </div>
     </section>
   );
