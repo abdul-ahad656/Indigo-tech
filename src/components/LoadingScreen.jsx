@@ -4,16 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 const PHRASE = "INDIGO TECH SOLUTION";
 
 // Wave timing windows [start, spread] in seconds
-// Matches the requested progression:
-//   wave 0:  0 – 0.5 s   (first few letters)
-//   wave 1:  0.45 – 1.6 s (more letters enter)
-//   wave 2:  1.35 – 2.6 s (most of phrase falling)
-//   wave 3:  2.3 – 3.4 s  (final letters)
 const WAVES = [
-  { start: 0,    spread: 0.50 },
-  { start: 0.45, spread: 1.15 },
-  { start: 1.35, spread: 1.25 },
-  { start: 2.30, spread: 1.10 },
+  { start: 0,    spread: 0.50 },  // 0 – 0.5 s   (first letters drop)
+  { start: 0.45, spread: 1.15 },  // 0.45 – 1.6 s (more enter)
+  { start: 1.35, spread: 1.25 },  // 1.35 – 2.6 s (bulk of phrase)
+  { start: 2.30, spread: 1.10 },  // 2.3 – 3.4 s  (final letters)
 ];
 
 function buildLetters() {
@@ -30,19 +25,32 @@ function buildLetters() {
   const total = chars.length;
 
   return chars.map(({ char, i: origIdx }, shuffledIdx) => {
-    const waveIdx = Math.min(Math.floor(shuffledIdx / total * WAVES.length), WAVES.length - 1);
+    const waveIdx = Math.min(
+      Math.floor((shuffledIdx / total) * WAVES.length),
+      WAVES.length - 1
+    );
     const w = WAVES[waveIdx];
+
+    // Landing zone: 68–82% down the viewport so letters sit near the bottom
+    // but never cause overflow. Variance creates the "pile" effect.
+    const landingVh = 68 + Math.random() * 14;
+
+    // Depth: letters start small (far away) and grow as they fall toward the viewer
+    const startScale = 0.52 + Math.random() * 0.18;  // 0.52 – 0.70
+    const landingScale = 0.94 + Math.random() * 0.22; // 0.94 – 1.16
 
     return {
       char,
       id: `${char}-${origIdx}`,
-      left:        5  + Math.random() * 88,          // 5 – 93 % horizontal
+      left:        5  + Math.random() * 88,           // 5 – 93 % horizontal
       delay:       w.start + Math.random() * w.spread,
-      duration:    2.2 + Math.random() * 1.4,        // 2.2 – 3.6 s per letter
-      drift:       (Math.random() - 0.5) * 64,        // ±32 px horizontal drift
-      rotateStart: (Math.random() - 0.5) * 44,        // ±22 °
-      rotateEnd:   (Math.random() - 0.5) * 44,        // ±22 °
-      scale:       0.88 + Math.random() * 0.28,       // 0.88 – 1.16
+      duration:    1.8 + Math.random() * 1.2,         // 1.8 – 3.0 s per letter
+      drift:       (Math.random() - 0.5) * 48,         // ±24 px lateral drift
+      rotateStart: (Math.random() - 0.5) * 30,         // ±15 ° initial tilt
+      rotateEnd:   (Math.random() - 0.5) * 140,        // ±70 ° final rotation (physical landing)
+      startScale,
+      landingScale,
+      finalY:      `${landingVh}vh`,                   // settles here — does NOT fall off-screen
     };
   });
 }
@@ -57,11 +65,12 @@ export default function LoadingScreen({ onComplete }) {
     []
   );
 
-  // True randomization — different on every mount
+  // True randomization — different layout on every page load
   const letters = useMemo(() => buildLetters(), []);
 
+  // After the last letter lands, add a 700 ms pause so the pile is visible
   const sequenceEnd = useMemo(
-    () => Math.max(...letters.map((l) => l.delay + l.duration)) + 0.3,
+    () => Math.max(...letters.map((l) => l.delay + l.duration)) + 0.7,
     [letters]
   );
 
@@ -82,8 +91,8 @@ export default function LoadingScreen({ onComplete }) {
     const schedule = () => {
       if (scheduled) return;
       scheduled = true;
-      // Clamp to 4.8 s so the user is never waiting too long
-      const wait = Math.min(sequenceEnd * 1000, 4800);
+      // Never exceed 5.5 s total — enough to see the full pile
+      const wait = Math.min(sequenceEnd * 1000, 5500);
       exitTimer = setTimeout(finish, wait);
     };
 
@@ -133,28 +142,27 @@ export default function LoadingScreen({ onComplete }) {
                 className="loading-screen-letter"
                 style={{ left: `${item.left}%` }}
                 initial={{
-                  y: "-14vh",
-                  x: 0,
+                  y:      "-14vh",
+                  x:      0,
                   opacity: 0,
-                  rotate: item.rotateStart,
-                  scale: item.scale,
+                  rotate:  item.rotateStart,
+                  scale:   item.startScale,   // starts small (far from viewer)
                 }}
                 animate={{
-                  y: "115vh",
-                  x: item.drift,
-                  // Quick fade-in at entry, solid through fall, quick fade at exit
-                  opacity: [0, 1, 1, 0],
-                  rotate: item.rotateEnd,
-                  scale: item.scale,
+                  y:      item.finalY,         // settles at the bottom — stays there
+                  x:      item.drift,
+                  opacity: [0, 1],             // fades in fast, stays fully visible
+                  rotate:  item.rotateEnd,     // lands at random physical orientation
+                  scale:   item.landingScale,  // grows as it falls toward the viewer
                 }}
                 transition={{
                   delay:    item.delay,
                   duration: item.duration,
-                  // Gravity-like: starts gently, accelerates, slight resistance at end
-                  ease: [0.4, 0, 0.75, 0.9],
+                  // Ease-out: fast fall with soft physical landing, no bounce
+                  ease: [0.22, 1, 0.36, 1],
                   opacity: {
-                    duration: item.duration,
-                    times:    [0, 0.07, 0.82, 1],
+                    delay:    item.delay,
+                    duration: 0.35,  // fixed quick fade-in regardless of fall speed
                     ease:     "linear",
                   },
                 }}
