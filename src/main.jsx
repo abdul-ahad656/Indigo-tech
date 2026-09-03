@@ -2,11 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { motion, useScroll } from "framer-motion";
 import Hero3DLogo from "./components/Hero3DLogo";
+import HeroPinStory, { HeroImpact, heroServices } from "./components/HeroPinStory";
 import LoadingScreen from "./components/LoadingScreen";
 import {
-  ArrowDown, ArrowUp, BriefcaseBusiness, ChevronRight, Clock3, Globe,
-  Headphones, Mail, MapPin, MessageCircle, Phone, Route, ShieldCheck,
-  Target, Users, Zap
+  ArrowUp, ChevronRight, Clock3,
+  Mail, MapPin, MessageCircle, Phone, ShieldCheck, Zap
 } from "lucide-react";
 import "./styles.css";
 
@@ -46,32 +46,7 @@ const team = [
   }
 ];
 
-const services = [
-  {
-    no: "01", icon: Headphones, title: "Client Acquisition & Support",
-    text: "Professional customer communication, inbound and outbound support, order handling, issue resolution and client relationship management."
-  },
-  {
-    no: "02", icon: BriefcaseBusiness, title: "Business Process Outsourcing",
-    text: "Flexible BPO support for businesses that need reliable people, structured processes, responsive communication and scalable operations."
-  },
-  {
-    no: "03", icon: Route, title: "Logistics / Truck Dispatch & Freight Brokerage",
-    text: "Streamlining freight operations through reliable truck dispatching, carrier coordination, load management, and cost-effective transportation solutions."
-  },
-  {
-    no: "04", icon: Target, title: "Customer Support & Dispatch Operations",
-    text: "Providing responsive customer support and efficient dispatch coordination to ensure smooth, timely, and reliable service delivery."
-  },
-  {
-    no: "05", icon: Zap, title: "Appointment Scheduling",
-    text: "Seamlessly schedule and manage client appointments with Indigo Tech Solutions for efficient, hassle-free service coordination."
-  },
-  {
-    no: "06", icon: Users, title: "Talent Hiring & Recruitment",
-    text: "Recruitment support and talent sourcing designed to help growing businesses build dependable remote and operational teams."
-  }
-];
+const services = heroServices;
 
 const capabilities = [
   "Dispatch Services", "Appointment Scheduling", "Accounts Receivable", "Plumbing and HVAC scheduling",
@@ -110,28 +85,6 @@ function Reveal({ children, delay = 0, className = "" }) {
     >
       {children}
     </motion.div>
-  );
-}
-
-const heroWords = ["businesses.", "operations.", "outcomes."];
-
-function HeroWord() {
-  const [index, setIndex] = React.useState(0);
-  const reduced = React.useMemo(
-    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    []
-  );
-
-  React.useEffect(() => {
-    if (reduced) return undefined;
-    const timer = setInterval(() => setIndex((value) => (value + 1) % heroWords.length), 2800);
-    return () => clearInterval(timer);
-  }, [reduced]);
-
-  return (
-    <span key={heroWords[index]} className="hero-word">
-      {heroWords[index]}
-    </span>
   );
 }
 
@@ -194,35 +147,8 @@ function App() {
       </nav>
 
       <main id="top">
-        <Hero3DLogo>
-          <div className="hero-overlay">
-            <h1 className="hero-headline">
-              Smart solutions.<br />
-              Stronger <HeroWord />
-            </h1>
-
-            <div className="hero-bottom">
-              <button className="hero-scroll" onClick={() => go("about")} aria-label="Scroll to about">
-                <ArrowDown size={16} />
-              </button>
-
-              <div className="hero-hint">
-                <span>Scroll to explode</span>
-                <span>Dare to watch the mark.</span>
-              </div>
-
-              <div className="hero-meta">
-                <div className="hero-est">
-                  <span className="hero-est-mark">
-                    <Globe size={15} />
-                    <b>Lahore</b>
-                  </span>
-                  <span>Remote operations. Reliable delivery.</span>
-                </div>
-                <p>BPO, logistics, dispatch, and customer support built for clarity, scale and impact.</p>
-              </div>
-            </div>
-          </div>
+        <Hero3DLogo back={<HeroImpact />}>
+          <HeroPinStory onContact={() => go("contact")} onAbout={() => go("about")} />
         </Hero3DLogo>
 
         <section className="ticker" aria-label="Indigo services">
@@ -258,7 +184,7 @@ function App() {
           <Reveal>
             <div className="section-heading light">
               <h2>Services that <em>move</em> business.</h2>
-              <p>From customer contact to logistics execution, Indigo turns operational work into dependable business support.</p>
+              <p>Offshoring, support, dispatch, scheduling, books and ecommerce — operational work delivered as dependable business support.</p>
             </div>
           </Reveal>
 

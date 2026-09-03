@@ -189,7 +189,7 @@ function IndigoMark({ triggerRef, onReady }) {
           start: "top top",
           end: "bottom top",
           scrub: 1.1,
-          onUpdate: (self) => apply(self.progress),
+          onUpdate: (self) => apply(Math.min(1, self.progress / 0.68)),
           onLeave: restore,
           onEnterBack: () => apply(1),
         },
@@ -233,7 +233,6 @@ function HeroArcs() {
 function Scene({ triggerRef, onReady }) {
   return (
     <>
-      <color attach="background" args={["#ffffff"]} />
       <Lights />
       <IndigoMark triggerRef={triggerRef} onReady={onReady} />
     </>
@@ -248,7 +247,7 @@ function FallbackMark() {
   );
 }
 
-export default function Hero3DLogo({ children }) {
+export default function Hero3DLogo({ children, back }) {
   const sectionRef = useRef(null);
   const [ready, setReady] = useState(false);
   const onReady = React.useCallback(() => setReady(true), []);
@@ -261,15 +260,17 @@ export default function Hero3DLogo({ children }) {
           <div className="hero-glow glow-one" />
           <div className="hero-glow glow-two" />
           <HeroArcs />
+          {back}
 
           <HeroErrorBoundary fallback={<FallbackMark />}>
             <div className="hero-3d-canvas-wrap">
               <Canvas
                 className="hero-3d-canvas"
                 dpr={[1, 1.75]}
-                gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+                gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+                onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
                 camera={{ position: [0, 0.12, 3.7], fov: 38, near: 0.1, far: 50 }}
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", background: "transparent" }}
               >
                 <Suspense fallback={null}>
                   <Scene triggerRef={sectionRef} onReady={onReady} />
