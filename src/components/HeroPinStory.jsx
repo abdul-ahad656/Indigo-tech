@@ -125,12 +125,14 @@ export default function HeroPinStory({ onContact, onAbout }) {
       gsap.set(fillWords, { color: "#8f88a8" });
       if (impact) gsap.set(impact, { y: vh * 1.05, autoAlpha: 0.15 });
 
+      const stack = document.querySelector(".page-stack");
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
           trigger,
           start: "top top",
-          end: "bottom top",
+          endTrigger: stack || trigger,
+          end: stack ? "top top" : "bottom top",
           scrub: 0.45,
         },
       });
@@ -149,7 +151,8 @@ export default function HeroPinStory({ onContact, onAbout }) {
       if (impact) {
         tl.to(impact, { y: 0, autoAlpha: 1, duration: 0.12 }, 0.36);
       }
-      tl.to({}, { duration: 0.5 }, 0.5);
+      /* Hold final hero frame while About slides over */
+      tl.to({}, { duration: 0.55 }, 0.48);
     }, root);
 
     return () => ctx.revert();

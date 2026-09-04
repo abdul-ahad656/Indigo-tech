@@ -181,13 +181,15 @@ function IndigoMark({ triggerRef, onReady }) {
       };
 
       const progress = { t: 0 };
+      const stack = document.querySelector(".page-stack");
       gsap.to(progress, {
         t: 1,
         ease: "none",
         scrollTrigger: {
           trigger,
           start: "top top",
-          end: "bottom top",
+          endTrigger: stack || trigger,
+          end: stack ? "top top" : "bottom top",
           scrub: 1.1,
           onUpdate: (self) => apply(Math.min(1, self.progress / 0.68)),
           onLeave: restore,
