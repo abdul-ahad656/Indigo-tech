@@ -70,7 +70,7 @@ function IndigoMark({ triggerRef, onReady }) {
     return group;
   }, [scene]);
 
-  const scale = Math.max(0.82, Math.min(viewport.width || 4, viewport.height || 3) * 0.3);
+  const scale = Math.max(0.88, Math.min(viewport.width || 4, viewport.height || 3) * 0.33);
 
   useLayoutEffect(() => {
     onReady?.();
@@ -215,7 +215,7 @@ function IndigoMark({ triggerRef, onReady }) {
   }, [mark, triggerRef]);
 
   return (
-    <group ref={spinRef} scale={scale} position={[0, 0, 0]}>
+    <group ref={spinRef} scale={scale} position={[0, -0.32, 0]}>
       <primitive object={mark} />
     </group>
   );
@@ -238,13 +238,13 @@ function FallbackMark() {
   );
 }
 
-export default function Hero3DLogo({ children, back, intro }) {
+export default function Hero3DLogo({ children, back }) {
   const sectionRef = useRef(null);
   const [ready, setReady] = useState(false);
   const onReady = React.useCallback(() => setReady(true), []);
 
   return (
-    <section ref={sectionRef} className="hero hero-3d" aria-label="Indigo editorial hero">
+    <section ref={sectionRef} className="hero hero-3d" aria-label="Indigo 3D mark">
       <div className="hero-3d-stage">
         <div className="hero-3d-frame">
           <div className="hero-ambience" aria-hidden="true">
@@ -256,40 +256,25 @@ export default function Hero3DLogo({ children, back, intro }) {
 
           {back}
 
-          <div className="hero-browser">
-            <div className="hero-browser-bar">
-              <div className="hero-browser-dots" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="hero-browser-url">
-                <span>indigotech.com</span>
-              </div>
-              <span className="hero-browser-chip">16:9 · Live</span>
+          <HeroErrorBoundary fallback={<FallbackMark />}>
+            <div className="hero-3d-canvas-wrap">
+              <Canvas
+                className="hero-3d-canvas"
+                dpr={[1, 1.75]}
+                gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+                onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+                camera={{ position: [0, 0.12, 3.7], fov: 38, near: 0.1, far: 50 }}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", background: "transparent" }}
+              >
+                <Suspense fallback={null}>
+                  <Scene triggerRef={sectionRef} onReady={onReady} />
+                </Suspense>
+              </Canvas>
+              {!ready && <LoaderOverlay />}
             </div>
-            <div className="hero-browser-body">
-              <div className="hero-3d-canvas-wrap">
-                <HeroErrorBoundary fallback={<FallbackMark />}>
-                  <Canvas
-                    className="hero-3d-canvas"
-                    dpr={[1, 1.75]}
-                    gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-                    onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-                    camera={{ position: [0, 0.08, 3.55], fov: 38, near: 0.1, far: 50 }}
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", background: "transparent" }}
-                  >
-                    <Suspense fallback={null}>
-                      <Scene triggerRef={sectionRef} onReady={onReady} />
-                    </Suspense>
-                  </Canvas>
-                  {!ready && <LoaderOverlay />}
-                  {!ready && <FallbackMark />}
-                </HeroErrorBoundary>
-              </div>
-              <div className="hero-browser-copy">{intro}</div>
-            </div>
-          </div>
+          </HeroErrorBoundary>
+
+          {!ready && <FallbackMark />}
 
           {children}
         </div>

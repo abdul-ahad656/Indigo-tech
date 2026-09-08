@@ -1,7 +1,10 @@
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight, Calculator, CalendarClock, Headphones, Route, ShoppingBag, Users } from "lucide-react";
+import {
+  ArrowDown, ArrowUpRight, Calculator, CalendarClock, Globe, Headphones,
+  Route, ShoppingBag, Users
+} from "lucide-react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -46,11 +49,27 @@ export const heroServices = [
   }
 ];
 
-const manifestoLines = [
-  "Indigo is an operations partner helping",
-  "businesses run smarter through people, process,",
-  "and technology."
-];
+const heroWords = ["businesses.", "operations.", "outcomes."];
+
+function HeroWord() {
+  const [index, setIndex] = React.useState(0);
+  const reduced = React.useMemo(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    []
+  );
+
+  React.useEffect(() => {
+    if (reduced) return undefined;
+    const timer = setInterval(() => setIndex((value) => (value + 1) % heroWords.length), 2800);
+    return () => clearInterval(timer);
+  }, [reduced]);
+
+  return (
+    <span key={heroWords[index]} className="hero-word">
+      {heroWords[index]}
+    </span>
+  );
+}
 
 function FillWords({ text }) {
   return text.split(/(\s+)/).map((chunk, i) =>
@@ -64,30 +83,11 @@ function FillWords({ text }) {
   );
 }
 
-export function HeroIntro({ onContact }) {
-  return (
-    <div className="hero-glass">
-      <div className="hero-copy-top">
-        <p className="hero-kicker">Indigo Tech Solutions · Editorial 01</p>
-        <h1 className="hero-headline">
-          Elevating the future of digital experiences
-        </h1>
-      </div>
-      <div className="hero-copy-bottom">
-        <p className="hero-lede">
-          Operations, support and systems for companies that need work to move with
-          precision — remote teams, live dispatch, and digital infrastructure built
-          to feel inevitable.
-        </p>
-        <div className="hero-intro-actions">
-          <button type="button" className="hero-cta" onClick={onContact}>
-            Start a project <ArrowUpRight size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+const manifestoLines = [
+  "Indigo is an operations partner helping",
+  "businesses run smarter through people, process,",
+  "and technology.",
+];
 
 export function HeroImpact() {
   return (
@@ -97,35 +97,35 @@ export function HeroImpact() {
         <span>Operate + Support + Scale + Operate + Support + Scale +</span>
       </div>
       <p className="hero-impact-kicker">Focused vision. Measured execution.</p>
-      <p className="hero-impact-foot">From idea to outcome.</p>
+      <p className="hero-impact-foot">✦ From idea to outcome.</p>
     </div>
   );
 }
 
-export default function HeroPinStory({ onAbout }) {
+export default function HeroPinStory({ onContact, onAbout }) {
   const rootRef = useRef(null);
 
   useLayoutEffect(() => {
     const trigger = document.querySelector(".hero-3d");
     const root = rootRef.current;
-    const browser = document.querySelector(".hero-browser");
     if (!trigger || !root) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const q = gsap.utils.selector(root);
     const ctx = gsap.context(() => {
+      const intro = q(".hero-scene-intro");
       const manifesto = q(".hero-scene-manifesto");
       const about = q(".hero-scene-about");
       const fillWords = q(".hero-fill-word");
       const impact = document.querySelector(".hero-scene-impact");
 
       const vh = window.innerHeight;
-      gsap.set(manifesto, { y: 0 });
-      gsap.set(about, { y: vh * 1.15 });
       const theme = getComputedStyle(document.querySelector(".hero-3d-frame") || document.documentElement);
       const fillIdle = theme.getPropertyValue("--text-tertiary").trim() || "#8e86a8";
       const fillActive = theme.getPropertyValue("--text-brand").trim() || "#b38cff";
-      gsap.set(fillWords, { color: fillIdle, fontWeight: 200 });
+      gsap.set(manifesto, { y: 0 });
+      gsap.set(about, { y: vh * 1.15 });
+      gsap.set(fillWords, { color: fillIdle });
       if (impact) gsap.set(impact, { y: vh * 1.05, autoAlpha: 0.15 });
 
       const stack = document.querySelector(".page-stack");
@@ -136,18 +136,17 @@ export default function HeroPinStory({ onAbout }) {
           start: "top top",
           endTrigger: stack || trigger,
           end: stack ? "top top" : "bottom top",
-          scrub: 0.45
-        }
+          scrub: 0.45,
+        },
       });
 
-      if (browser) tl.to(browser, { y: -vh, autoAlpha: 0, duration: 0.12 }, 0);
+      tl.to(intro, { y: -vh, duration: 0.12 }, 0);
       tl.to(manifesto, { y: -vh, duration: 0.14 }, 0);
       tl.to(fillWords, {
         color: fillActive,
-        fontWeight: 800,
         stagger: { each: 0.01, from: "start" },
         duration: 0.06,
-        ease: "none"
+        ease: "none",
       }, 0.08);
       tl.to(manifesto, { y: -vh * 2, duration: 0.12 }, 0.22);
       tl.to(about, { y: 0, duration: 0.12 }, 0.22);
@@ -163,6 +162,32 @@ export default function HeroPinStory({ onAbout }) {
 
   return (
     <div ref={rootRef} className="hero-overlay">
+      <div className="hero-scene hero-scene-intro">
+        <h1 className="hero-headline">
+          Smart solutions.<br />
+          Stronger <HeroWord />
+        </h1>
+        <div className="hero-intro-links">
+          <button type="button" onClick={onContact}>Discuss your project <ArrowUpRight size={14} /></button>
+          <button type="button" onClick={onContact}>Book a 30-minute call <ArrowUpRight size={14} /></button>
+        </div>
+        <div className="hero-bottom">
+          <button className="hero-scroll" onClick={onAbout} aria-label="Scroll to about">
+            <ArrowDown size={16} />
+          </button>
+          <div className="hero-meta">
+            <div className="hero-est">
+              <span className="hero-est-mark">
+                <Globe size={15} />
+                <b>Lahore</b>
+              </span>
+              <span>Remote operations. Reliable delivery.</span>
+            </div>
+            <p>BPO, logistics, dispatch, and customer support built for clarity, scale and impact.</p>
+          </div>
+        </div>
+      </div>
+
       <div className="hero-scene hero-scene-manifesto">
         <p>
           {manifestoLines.map((line) => (
@@ -179,9 +204,6 @@ export default function HeroPinStory({ onAbout }) {
           Our mission is to make operations feel human by delivering support that is
           reliable, purposeful, and meaningful to growing teams.
         </p>
-        <button type="button" className="hero-scroll" onClick={onAbout}>
-          Scroll
-        </button>
       </div>
     </div>
   );
