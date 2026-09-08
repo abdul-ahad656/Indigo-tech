@@ -54,8 +54,7 @@ function Lights() {
       <ambientLight intensity={0.5} color="#d7c4ff" />
       <directionalLight position={[4.2, 5.4, 6]} intensity={1.4} color="#ffffff" />
       <directionalLight position={[-5.5, 1.8, -3.8]} intensity={0.9} color="#c4b5fd" />
-      <pointLight position={[0.2, 0.4, 3.2]} intensity={0.7} color="#9b7dff" />
-      <pointLight position={[1.4, 1.2, 2.6]} intensity={0.55} color="#00f5d4" distance={8} />
+      <pointLight position={[0.2, 0.4, 3.2]} intensity={0.55} color="#9b7dff" />
     </>
   );
 }
@@ -70,7 +69,7 @@ function IndigoMark({ triggerRef, onReady }) {
     return group;
   }, [scene]);
 
-  const scale = Math.max(0.88, Math.min(viewport.width || 4, viewport.height || 3) * 0.33);
+  const scale = Math.max(0.52, Math.min(viewport.width || 4, viewport.height || 3) * 0.2);
 
   useLayoutEffect(() => {
     onReady?.();
@@ -215,7 +214,7 @@ function IndigoMark({ triggerRef, onReady }) {
   }, [mark, triggerRef]);
 
   return (
-    <group ref={spinRef} scale={scale} position={[0, -0.32, 0]}>
+    <group ref={spinRef} scale={scale} position={[1.05, -0.12, 0]}>
       <primitive object={mark} />
     </group>
   );
@@ -247,13 +246,6 @@ export default function Hero3DLogo({ children, back }) {
     <section ref={sectionRef} className="hero hero-3d" aria-label="Indigo 3D mark">
       <div className="hero-3d-stage">
         <div className="hero-3d-frame">
-          <div className="hero-ambience" aria-hidden="true">
-            <span className="hero-orb hero-orb-violet" />
-            <span className="hero-orb hero-orb-core" />
-            <span className="hero-orb hero-orb-mint" />
-            <div className="hero-grid-fade" />
-          </div>
-
           {back}
 
           <HeroErrorBoundary fallback={<FallbackMark />}>
@@ -263,7 +255,7 @@ export default function Hero3DLogo({ children, back }) {
                 dpr={[1, 1.75]}
                 gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
                 onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-                camera={{ position: [0, 0.12, 3.7], fov: 38, near: 0.1, far: 50 }}
+                camera={{ position: [0.35, 0.08, 3.9], fov: 38, near: 0.1, far: 50 }}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", background: "transparent" }}
               >
                 <Suspense fallback={null}>

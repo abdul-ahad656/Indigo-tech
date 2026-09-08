@@ -1,10 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  ArrowDown, ArrowUpRight, Calculator, CalendarClock, Globe, Headphones,
-  Route, ShoppingBag, Users
-} from "lucide-react";
+import { ArrowUpRight, Calculator, CalendarClock, Headphones, Route, ShoppingBag, Users } from "lucide-react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -50,13 +47,50 @@ export const heroServices = [
 ];
 
 const heroWords = ["businesses.", "operations.", "outcomes."];
+const LIGHT = { wght: 200, slnt: -9 };
+const HEAVY = { wght: 800, slnt: 0 };
 
-function HeroWord() {
-  const [index, setIndex] = React.useState(0);
-  const reduced = React.useMemo(
+function useReducedMotion() {
+  return React.useMemo(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     []
   );
+}
+
+function VariableLine({ parts, active, from, to, staggerFrom = "first", className }) {
+  const reduced = useReducedMotion();
+  const chars = parts.flatMap((part) =>
+    Array.from(part.text).map((ch) => ({ ch, className: part.className || "" }))
+  );
+  const count = chars.length;
+  const settings = active && !reduced ? to : from;
+
+  return (
+    <span className={className}>
+      {chars.map((item, i) => {
+        const order = staggerFrom === "last" ? count - 1 - i : i;
+        return (
+          <span
+            key={`${item.ch}-${i}`}
+            className={`hero-var-char ${item.className}`.trim()}
+            style={{
+              fontWeight: settings.wght,
+              fontStyle: `oblique ${settings.slnt}deg`,
+              fontVariationSettings: `'wght' ${settings.wght}`,
+              transitionDelay: reduced ? "0s" : `${order * 0.018}s`
+            }}
+          >
+            {item.ch === " " ? "\u00a0" : item.ch}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+function HeroWord({ active }) {
+  const [index, setIndex] = React.useState(0);
+  const reduced = useReducedMotion();
 
   React.useEffect(() => {
     if (reduced) return undefined;
@@ -65,9 +99,48 @@ function HeroWord() {
   }, [reduced]);
 
   return (
-    <span key={heroWords[index]} className="hero-word">
-      {heroWords[index]}
-    </span>
+    <VariableLine
+      key={heroWords[index]}
+      className="hero-word"
+      parts={[{ text: heroWords[index] }]}
+      active={active}
+      from={HEAVY}
+      to={LIGHT}
+      staggerFrom="last"
+    />
+  );
+}
+
+function HeroLockup() {
+  const [hot, setHot] = React.useState(false);
+
+  return (
+    <h1
+      className={`hero-lockup${hot ? " is-hot" : ""}`}
+      tabIndex={0}
+      onPointerEnter={() => setHot(true)}
+      onPointerLeave={() => setHot(false)}
+      onFocus={() => setHot(true)}
+      onBlur={() => setHot(false)}
+    >
+      <VariableLine
+        className="hero-lockup-line"
+        parts={[{ text: "Smart solutions." }]}
+        active={hot}
+        from={LIGHT}
+        to={HEAVY}
+      />
+      <span className="hero-lockup-line">
+        <VariableLine
+          parts={[{ text: "Stronger " }]}
+          active={hot}
+          from={HEAVY}
+          to={LIGHT}
+          staggerFrom="last"
+        />
+        <HeroWord active={hot} />
+      </span>
+    </h1>
   );
 }
 
@@ -86,7 +159,7 @@ function FillWords({ text }) {
 const manifestoLines = [
   "Indigo is an operations partner helping",
   "businesses run smarter through people, process,",
-  "and technology.",
+  "and technology."
 ];
 
 export function HeroImpact() {
@@ -97,7 +170,7 @@ export function HeroImpact() {
         <span>Operate + Support + Scale + Operate + Support + Scale +</span>
       </div>
       <p className="hero-impact-kicker">Focused vision. Measured execution.</p>
-      <p className="hero-impact-foot">✦ From idea to outcome.</p>
+      <p className="hero-impact-foot">From idea to outcome.</p>
     </div>
   );
 }
@@ -125,7 +198,7 @@ export default function HeroPinStory({ onContact, onAbout }) {
       const fillActive = theme.getPropertyValue("--text-brand").trim() || "#b38cff";
       gsap.set(manifesto, { y: 0 });
       gsap.set(about, { y: vh * 1.15 });
-      gsap.set(fillWords, { color: fillIdle });
+      gsap.set(fillWords, { color: fillIdle, fontWeight: 200 });
       if (impact) gsap.set(impact, { y: vh * 1.05, autoAlpha: 0.15 });
 
       const stack = document.querySelector(".page-stack");
@@ -136,17 +209,18 @@ export default function HeroPinStory({ onContact, onAbout }) {
           start: "top top",
           endTrigger: stack || trigger,
           end: stack ? "top top" : "bottom top",
-          scrub: 0.45,
-        },
+          scrub: 0.45
+        }
       });
 
       tl.to(intro, { y: -vh, duration: 0.12 }, 0);
       tl.to(manifesto, { y: -vh, duration: 0.14 }, 0);
       tl.to(fillWords, {
         color: fillActive,
+        fontWeight: 800,
         stagger: { each: 0.01, from: "start" },
         duration: 0.06,
-        ease: "none",
+        ease: "none"
       }, 0.08);
       tl.to(manifesto, { y: -vh * 2, duration: 0.12 }, 0.22);
       tl.to(about, { y: 0, duration: 0.12 }, 0.22);
@@ -163,29 +237,15 @@ export default function HeroPinStory({ onContact, onAbout }) {
   return (
     <div ref={rootRef} className="hero-overlay">
       <div className="hero-scene hero-scene-intro">
-        <h1 className="hero-headline">
-          Smart solutions.<br />
-          Stronger <HeroWord />
-        </h1>
-        <div className="hero-intro-links">
-          <button type="button" onClick={onContact}>Discuss your project <ArrowUpRight size={14} /></button>
-          <button type="button" onClick={onContact}>Book a 30-minute call <ArrowUpRight size={14} /></button>
-        </div>
-        <div className="hero-bottom">
-          <button className="hero-scroll" onClick={onAbout} aria-label="Scroll to about">
-            <ArrowDown size={16} />
+        <div className="hero-intro-copy">
+          <HeroLockup />
+          <button type="button" className="hero-cta" onClick={onContact}>
+            Discuss your project <ArrowUpRight size={14} />
           </button>
-          <div className="hero-meta">
-            <div className="hero-est">
-              <span className="hero-est-mark">
-                <Globe size={15} />
-                <b>Lahore</b>
-              </span>
-              <span>Remote operations. Reliable delivery.</span>
-            </div>
-            <p>BPO, logistics, dispatch, and customer support built for clarity, scale and impact.</p>
-          </div>
         </div>
+        <button type="button" className="hero-scroll" onClick={onAbout}>
+          Scroll
+        </button>
       </div>
 
       <div className="hero-scene hero-scene-manifesto">

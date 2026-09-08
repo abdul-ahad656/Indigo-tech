@@ -6,12 +6,5 @@
         "x-api-key": "${21ST_API_KEY}"
       }
     }
-  },
-  "env": {
-    "21ST_API_KEY": {
-      "description": "The API key for the 21st API",
-      "type": "string",
-      "required": true
-    }
   }
 }
