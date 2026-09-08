@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, useScroll } from "framer-motion";
 import Hero3DLogo from "./components/Hero3DLogo";
-import HeroPinStory, { HeroImpact } from "./components/HeroPinStory";
+import HeroPinStory, { HeroImpact, HeroIntro } from "./components/HeroPinStory";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import CapabilitiesTicker from "./components/CapabilitiesTicker";
@@ -16,9 +16,13 @@ export default function App() {
   const { scrollYProgress } = useScroll();
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [onPage, setOnPage] = React.useState(false);
 
   React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      setOnPage(window.scrollY > window.innerHeight * 2.35);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -42,11 +46,11 @@ export default function App() {
     <div className="site">
       <motion.div className="progress" style={{ scaleX: scrollYProgress }} />
 
-      <Nav scrolled={scrolled} open={open} setOpen={setOpen} onNavigate={go} />
+      <Nav scrolled={scrolled} open={open} setOpen={setOpen} onNavigate={go} onPage={onPage} />
 
       <main id="top">
-        <Hero3DLogo back={<HeroImpact />}>
-          <HeroPinStory onContact={() => go("contact")} onAbout={() => go("about")} />
+        <Hero3DLogo back={<HeroImpact />} intro={<HeroIntro onContact={() => go("contact")} />}>
+          <HeroPinStory onAbout={() => go("about")} />
         </Hero3DLogo>
 
         <div className="page-stack">

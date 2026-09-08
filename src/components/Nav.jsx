@@ -1,8 +1,8 @@
 import { navLinks } from "../data/site";
 
-export default function Nav({ scrolled, open, setOpen, onNavigate }) {
+export default function Nav({ scrolled, open, setOpen, onNavigate, onPage }) {
   return (
-    <nav className={`nav ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""}`}>
+    <nav className={`nav ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""} ${onPage ? "is-on-page" : ""}`}>
       <button className="brand" onClick={() => onNavigate("top")} aria-label="Go home">
         <img src="/assets/indigo-logo.jpg" alt="Indigo Tech Solutions logo" />
         <span>Indigo</span>

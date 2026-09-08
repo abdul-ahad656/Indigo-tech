@@ -1,0 +1,149 @@
+/*
+  Indigo accessible color system (WCAG 2.1)
+  Primary #5A3DB0  |  Accent #B38CFF  |  Pop teal #14F0D0  |  Pop amber #FFC53D
+
+  Ratios are (L1+0.05)/(L2+0.05) on sRGB relative luminance.
+  AA normal text 4.5:1  |  AAA 7:1  |  UI / large text 3:1
+
+  LIGHT
+  text-primary  #0B0820 on bg-surface #EDE8F6     16.33  AAA
+  text-brand    #5A3DB0 on bg-surface             6.40   AA (AAA needs a near-white canvas)
+  text-brand    #5A3DB0 on #FFFFFF                7.69   AAA
+  text-secondary#4A4860 on bg-surface             7.32   AAA
+  text-tertiary #6B6578 on bg-surface             4.65   AA
+  text-on-brand #FFFFFF on btn-primary-bg #5A3DB0 7.69   AAA
+  text-on-accent#0B0820 on #B38CFF                7.58   AAA
+  text-on-accent#0B0820 on pop-teal #14F0D0       13.46  AAA
+  text-on-accent#0B0820 on pop-amber #FFC53D      12.44  AAA
+  white         #FFFFFF on btn-primary-hover #4A2F96  9.82 AAA
+  focus-ring    #0E8A78 on bg-surface             3.55   UI AA (3:1)
+  #B38CFF as text on #EDE8F6                      2.15   FAIL — do not use
+
+  DARK
+  text-primary  #F8F7FE on bg-surface #0B0820     18.44  AAA
+  text-brand    #B38CFF on #0B0820                7.58   AAA
+  text-secondary#C8C4D8 on #0B0820                11.54  AAA
+  pop-teal      #14F0D0 on #0B0820                13.46  AAA
+  pop-teal      #14F0D0 on #5A3DB0                5.28   AA
+  pop-amber     #FFC53D on #0B0820                12.44  AAA
+  pop-amber     #FFC53D on #5A3DB0                4.88   AA
+  focus-ring    #14F0D0 on #0B0820                13.46  AAA
+  #5A3DB0 as text on #0B0820                      2.55   FAIL — do not use
+
+  BACKGROUNDS (painted canvases)
+  bg-surface        #EDE8F6  L=0.8237  live hero frame, body, loading — visible lavender
+  bg-surface-muted  #EAE4F5  L=0.7957  panels / loader track
+  bg-deep           #0B0820  L=0.0035  dark theme canvas
+  near-white #F8F7FE          L=0.9363  dropped — reads as white
+  legacy #FFFFFF              L=1.0000  dropped — do not paint hero with pure white
+  old-nav #F7F7FA             L=0.9320  dropped — nav uses bg-surface
+
+  On bg-surface #EDE8F6
+  #0B0820 16.33 AAA  |  #5A3DB0 6.40 AA   |  #4A4860 7.32 AAA  |  #6B6578 4.65 AA
+  #0E8A78 3.55 UI    |  #B38CFF 2.15 FAIL |  #14F0D0 1.21 FAIL |  #FFC53D 1.31 FAIL
+
+  On bg-surface-muted #EAE4F5
+  #0B0820 15.81 AAA  |  #5A3DB0 6.20 AA   |  #4A4860 7.09 AAA  |  #6B6578 4.50 AA
+
+  On bg-deep #0B0820
+  #F8F7FE 18.44 AAA  |  #B38CFF 7.58 AAA  |  #C8C4D8 11.54 AAA
+  #14F0D0 13.46 AAA  |  #FFC53D 12.44 AAA |  #5A3DB0 2.55 FAIL
+*/
+
+:root {
+  --bg-surface: #ede8f6;
+  --bg-surface-muted: #eae4f5;
+  --text-primary: #0b0820;
+  --text-secondary: #4a4860;
+  --text-tertiary: #6b6578;
+  --text-brand: #5a3db0;
+  --text-on-brand: #ffffff;
+  --text-on-accent: #0b0820;
+  --border-subtle: #dedde7;
+  --border-accent: #5a3db0;
+  --btn-primary-bg: #5a3db0;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #4a2f96;
+  --btn-accent-bg: #b38cff;
+  --btn-accent-text: #0b0820;
+  --btn-pop-bg: #00f5d4;
+  --btn-pop-text: #0b0820;
+  --focus-ring: #0e8a78;
+  --pop-teal: #00f5d4;
+  --pop-amber: #ffc53d;
+  --brand-primary: #5a3db0;
+  --brand-accent: #b38cff;
+  --bg-deep: #0f0b1e;
+  --hero-obsidian: #0f0b1e;
+  --hero-violet: #5a3db0;
+  --hero-lavender: #b38cff;
+  --hero-mint: #00f5d4;
+  --hero-text: #f3efff;
+
+  --bg: var(--bg-surface);
+  --ink: var(--text-primary);
+  --muted: var(--text-secondary);
+  --line: var(--border-subtle);
+  --purple: var(--brand-primary);
+  --purple2: var(--brand-accent);
+  --deep: var(--bg-deep);
+  --white: var(--bg-surface);
+  --acid: var(--pop-teal);
+}
+
+.dark,
+[data-theme="dark"] {
+  --bg-surface: #0f0b1e;
+  --bg-surface-muted: #16122c;
+  --text-primary: #f3efff;
+  --text-secondary: #c8c4d8;
+  --text-tertiary: #8e86a8;
+  --text-brand: #b38cff;
+  --text-on-brand: #ffffff;
+  --text-on-accent: #0b0820;
+  --border-subtle: #2d2841;
+  --border-accent: #b38cff;
+  --btn-primary-bg: #5a3db0;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #4a2f96;
+  --btn-accent-bg: #b38cff;
+  --btn-accent-text: #0b0820;
+  --btn-pop-bg: #00f5d4;
+  --btn-pop-text: #0b0820;
+  --focus-ring: #00f5d4;
+  --pop-teal: #00f5d4;
+  --pop-amber: #ffc53d;
+  --bg-deep: #0f0b1e;
+  --bg: var(--bg-surface);
+  --ink: var(--text-primary);
+  --muted: var(--text-secondary);
+  --line: var(--border-subtle);
+  --white: var(--text-primary);
+}
+
+@theme {
+  --color-background: var(--bg-surface);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-muted: var(--bg-surface-muted);
+  --color-bg-deep: var(--bg-deep);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-brand: var(--text-brand);
+  --color-text-on-brand: var(--text-on-brand);
+  --color-text-on-accent: var(--text-on-accent);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-accent: var(--border-accent);
+  --color-btn-primary-bg: var(--btn-primary-bg);
+  --color-btn-primary-text: var(--btn-primary-text);
+  --color-btn-primary-hover: var(--btn-primary-hover);
+  --color-btn-accent-bg: var(--btn-accent-bg);
+  --color-btn-accent-text: var(--btn-accent-text);
+  --color-btn-pop-bg: var(--btn-pop-bg);
+  --color-btn-pop-text: var(--btn-pop-text);
+  --color-focus-ring: var(--focus-ring);
+  --color-pop-teal: var(--pop-teal);
+  --color-pop-amber: var(--pop-amber);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+}
