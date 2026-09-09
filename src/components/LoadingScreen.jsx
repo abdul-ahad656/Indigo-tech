@@ -3,54 +3,37 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const PHRASE = "INDIGO TECH SOLUTION";
 
-// Wave timing windows [start, spread] in seconds
-const WAVES = [
-  { start: 0,    spread: 0.50 },  // 0 – 0.5 s   (first letters drop)
-  { start: 0.45, spread: 1.15 },  // 0.45 – 1.6 s (more enter)
-  { start: 1.35, spread: 1.25 },  // 1.35 – 2.6 s (bulk of phrase)
-  { start: 2.30, spread: 1.10 },  // 2.3 – 3.4 s  (final letters)
-];
-
 function buildLetters() {
-  const chars = PHRASE.split("")
-    .map((char, i) => ({ char, i }))
-    .filter(({ char }) => char !== " ");
+  // Preserve order so letters land in place and spell the phrase.
+  const chars = PHRASE.split("");
 
-  // Fisher-Yates shuffle so each wave gets random characters
-  for (let k = chars.length - 1; k > 0; k--) {
+  // Randomize the DROP ORDER (which letter lands first) without
+  // touching visual order — each letter still knows its own position.
+  const dropOrder = chars.map((_, i) => i);
+  for (let k = dropOrder.length - 1; k > 0; k--) {
     const j = Math.floor(Math.random() * (k + 1));
-    [chars[k], chars[j]] = [chars[j], chars[k]];
+    [dropOrder[k], dropOrder[j]] = [dropOrder[j], dropOrder[k]];
   }
 
-  const total = chars.length;
+  const perLetterGap = 0.09; // seconds between drops
+  const fallDuration = 1.15;
 
-  return chars.map(({ char, i: origIdx }, shuffledIdx) => {
-    const waveIdx = Math.min(
-      Math.floor((shuffledIdx / total) * WAVES.length),
-      WAVES.length - 1
-    );
-    const w = WAVES[waveIdx];
-
-    // Landing zone: 68–82% down the viewport so letters sit near the bottom
-    // but never cause overflow. Variance creates the "pile" effect.
-    const landingVh = 68 + Math.random() * 14;
-
-    // Depth: letters start small (far away) and grow as they fall toward the viewer
-    const startScale = 0.52 + Math.random() * 0.18;  // 0.52 – 0.70
-    const landingScale = 0.94 + Math.random() * 0.22; // 0.94 – 1.16
-
+  return chars.map((char, i) => {
+    const order = dropOrder.indexOf(i);
     return {
       char,
-      id: `${char}-${origIdx}`,
-      left:        5  + Math.random() * 88,           // 5 – 93 % horizontal
-      delay:       w.start + Math.random() * w.spread,
-      duration:    1.8 + Math.random() * 1.2,         // 1.8 – 3.0 s per letter
-      drift:       (Math.random() - 0.5) * 48,         // ±24 px lateral drift
-      rotateStart: (Math.random() - 0.5) * 30,         // ±15 ° initial tilt
-      rotateEnd:   (Math.random() - 0.5) * 140,        // ±70 ° final rotation (physical landing)
-      startScale,
-      landingScale,
-      finalY:      `${landingVh}vh`,                   // settles here — does NOT fall off-screen
+      id: `${char}-${i}`,
+      isSpace: char === " ",
+      delay: order * perLetterGap,
+      duration: fallDuration,
+      // 3D tumble while falling
+      rotateXStart: -180 + Math.random() * 360,
+      rotateYStart: -180 + Math.random() * 360,
+      rotateZStart: -90 + Math.random() * 180,
+      // Random horizontal drift on the way down (settles to 0)
+      driftX: (Math.random() - 0.5) * 60,
+      // Start depth (far from viewer) so it grows as it falls
+      startZ: -600 - Math.random() * 400,
     };
   });
 }
@@ -65,12 +48,10 @@ export default function LoadingScreen({ onComplete }) {
     []
   );
 
-  // True randomization — different layout on every page load
   const letters = useMemo(() => buildLetters(), []);
 
-  // After the last letter lands, add a 700 ms pause so the pile is visible
   const sequenceEnd = useMemo(
-    () => Math.max(...letters.map((l) => l.delay + l.duration)) + 0.7,
+    () => Math.max(...letters.map((l) => l.delay + l.duration)) + 0.9,
     [letters]
   );
 
@@ -91,21 +72,18 @@ export default function LoadingScreen({ onComplete }) {
     const schedule = () => {
       if (scheduled) return;
       scheduled = true;
-      // Never exceed 5.5 s total — enough to see the full pile
-      const wait = Math.min(sequenceEnd * 1000, 5500);
+      const wait = Math.min(sequenceEnd * 1000, 6000);
       exitTimer = setTimeout(finish, wait);
     };
-
-    const onLoad = () => schedule();
 
     if (document.readyState === "complete") {
       schedule();
     } else {
-      window.addEventListener("load", onLoad);
+      window.addEventListener("load", schedule);
     }
 
     return () => {
-      window.removeEventListener("load", onLoad);
+      window.removeEventListener("load", schedule);
       clearTimeout(exitTimer);
       clearTimeout(completeTimer);
     };
@@ -118,10 +96,24 @@ export default function LoadingScreen({ onComplete }) {
         role="status"
         aria-live="polite"
       >
-        <span className="loading-screen-sr">{PHRASE}</span>
+        <span className="loading-screen-static">{PHRASE}</span>
       </div>
     );
   }
+
+  // Split phrase into words so we can wrap each word and prevent line breaks
+  // inside a word while still spacing them apart.
+  const words = [];
+  let currentWord = [];
+  letters.forEach((item) => {
+    if (item.isSpace) {
+      if (currentWord.length) words.push(currentWord);
+      currentWord = [];
+    } else {
+      currentWord.push(item);
+    }
+  });
+  if (currentWord.length) words.push(currentWord);
 
   return (
     <AnimatePresence>
@@ -135,41 +127,49 @@ export default function LoadingScreen({ onComplete }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.64, ease: [0.4, 0, 0.2, 1] }}
         >
-          <div className="loading-screen-canvas" aria-hidden="true">
-            {letters.map((item) => (
-              <motion.span
-                key={item.id}
-                className="loading-screen-letter"
-                style={{ left: `${item.left}%` }}
-                initial={{
-                  y:      "-14vh",
-                  x:      0,
-                  opacity: 0,
-                  rotate:  item.rotateStart,
-                  scale:   item.startScale,   // starts small (far from viewer)
-                }}
-                animate={{
-                  y:      item.finalY,         // settles at the bottom — stays there
-                  x:      item.drift,
-                  opacity: [0, 1],             // fades in fast, stays fully visible
-                  rotate:  item.rotateEnd,     // lands at random physical orientation
-                  scale:   item.landingScale,  // grows as it falls toward the viewer
-                }}
-                transition={{
-                  delay:    item.delay,
-                  duration: item.duration,
-                  // Ease-out: fast fall with soft physical landing, no bounce
-                  ease: [0.22, 1, 0.36, 1],
-                  opacity: {
-                    delay:    item.delay,
-                    duration: 0.35,  // fixed quick fade-in regardless of fall speed
-                    ease:     "linear",
-                  },
-                }}
-              >
-                {item.char}
-              </motion.span>
-            ))}
+          <div className="loading-screen-stage" aria-hidden="true">
+            <div className="loading-screen-phrase">
+              {words.map((word, wi) => (
+                <span key={`w-${wi}`} className="loading-screen-word">
+                  {word.map((item) => (
+                    <motion.span
+                      key={item.id}
+                      className="loading-screen-letter"
+                      initial={{
+                        y: "-70vh",
+                        x: item.driftX,
+                        z: item.startZ,
+                        opacity: 0,
+                        rotateX: item.rotateXStart,
+                        rotateY: item.rotateYStart,
+                        rotateZ: item.rotateZStart,
+                      }}
+                      animate={{
+                        y: 0,
+                        x: 0,
+                        z: 0,
+                        opacity: 1,
+                        rotateX: 0,
+                        rotateY: 0,
+                        rotateZ: 0,
+                      }}
+                      transition={{
+                        delay: item.delay,
+                        duration: item.duration,
+                        ease: [0.22, 1, 0.36, 1],
+                        opacity: {
+                          delay: item.delay,
+                          duration: 0.28,
+                          ease: "linear",
+                        },
+                      }}
+                    >
+                      {item.char}
+                    </motion.span>
+                  ))}
+                </span>
+              ))}
+            </div>
           </div>
 
           <span className="loading-screen-sr">{PHRASE}</span>

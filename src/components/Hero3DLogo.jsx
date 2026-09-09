@@ -47,14 +47,30 @@ function LoaderOverlay() {
   );
 }
 
+function matchLogoMaterial(material, name = "") {
+  const mat = material.clone();
+  const key = name.toLowerCase();
+  const isChip = key.includes("chip");
+  const isRing = key.includes("ring");
+  const target = isChip ? "#7c4ae0" : isRing ? "#380080" : "#4a1498";
+  if (mat.color) mat.color.set(target);
+  if ("emissive" in mat) {
+    mat.emissive.set(isChip ? "#5a3db0" : "#2a0066");
+    mat.emissiveIntensity = isChip ? 0.14 : 0.06;
+  }
+  if ("roughness" in mat) mat.roughness = 0.4;
+  if ("metalness" in mat) mat.metalness = 0.22;
+  return mat;
+}
+
 function Lights() {
   return (
     <>
-      <hemisphereLight args={["#b38cff", "#0f0b1e", 0.55]} />
-      <ambientLight intensity={0.5} color="#d7c4ff" />
-      <directionalLight position={[4.2, 5.4, 6]} intensity={1.4} color="#ffffff" />
-      <directionalLight position={[-5.5, 1.8, -3.8]} intensity={0.9} color="#c4b5fd" />
-      <pointLight position={[0.2, 0.4, 3.2]} intensity={0.55} color="#9b7dff" />
+      <hemisphereLight args={["#b38cff", "#1c1736", 0.42]} />
+      <ambientLight intensity={0.36} color="#7a58c8" />
+      <directionalLight position={[4.2, 5.4, 6]} intensity={1.35} color="#ffffff" />
+      <directionalLight position={[-5.5, 1.8, -3.8]} intensity={0.55} color="#5a3db0" />
+      <pointLight position={[0.2, 0.4, 3.2]} intensity={0.4} color="#9050e8" />
     </>
   );
 }
@@ -66,6 +82,15 @@ function IndigoMark({ triggerRef, onReady }) {
   const mark = useMemo(() => {
     const group = new THREE.Group();
     scene.children.forEach((child) => group.add(child.clone(true)));
+    group.traverse((child) => {
+      if (!child.isMesh) return;
+      const name = `${child.name} ${child.parent?.name || ""}`;
+      if (Array.isArray(child.material)) {
+        child.material = child.material.map((material) => matchLogoMaterial(material, name));
+      } else if (child.material) {
+        child.material = matchLogoMaterial(child.material, name);
+      }
+    });
     return group;
   }, [scene]);
 
@@ -214,7 +239,7 @@ function IndigoMark({ triggerRef, onReady }) {
   }, [mark, triggerRef]);
 
   return (
-    <group ref={spinRef} scale={scale} position={[1.05, -0.12, 0]}>
+    <group ref={spinRef} scale={scale} position={[0, 0, 0]}>
       <primitive object={mark} />
     </group>
   );
@@ -255,7 +280,7 @@ export default function Hero3DLogo({ children, back }) {
                 dpr={[1, 1.75]}
                 gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
                 onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-                camera={{ position: [0.35, 0.08, 3.9], fov: 38, near: 0.1, far: 50 }}
+                camera={{ position: [0, 0, 3.7], fov: 38, near: 0.1, far: 50 }}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", background: "transparent" }}
               >
                 <Suspense fallback={null}>
