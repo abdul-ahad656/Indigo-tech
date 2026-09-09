@@ -1,187 +1,184 @@
-import React, { useEffect, useMemo, useRef, useState, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Text3D } from "@react-three/drei";
-import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
-// Two-row layout: "INDIGO TECH" / "SOLUTION"
-// Row layout constants tuned for helvetiker_bold at SZ=1.0
-const ROWS = [["I","N","D","I","G","O"," ","T","E","C","H"], ["S","O","L","U","T","I","O","N"]];
+// Two-row layout built dynamically once font loads
+const ROWS = [
+  ["I","N","D","I","G","O"," ","T","E","C","H"],
+  ["S","O","L","U","T","I","O","N"],
+];
+const ROW_Y = [0.6, -0.6];
 const SZ    = 1.0;    // font size (letter height)
 const DEPTH = 0.28;   // extrusion depth
-const ADV   = 0.77;   // advance width per char at SZ=1.0
-const GAP   = 0.55;   // word gap (space char)
-const ROW_Y_TOP    = 0.7;   // y of top row centre
-const ROW_Y_BOTTOM = -0.7;  // y of bottom row centre
+const FALL  = 1.25;   // fall duration (s)
 const FONT  = "/fonts/helvetiker_bold.typeface.json";
 
-function rowWidth(chars) {
-  let w = 0;
-  chars.forEach(c => { w += c === " " ? GAP : ADV; });
-  return w;
-}
-
-function buildLayout() {
-  const all = [];
-  let total = 0;
-  ROWS.forEach(row => { row.forEach(c => { if (c !== " ") total++; }); });
-
-  // Randomize drop order across all non-space letters
-  const order = Array.from({ length: total }, (_, i) => i);
-  for (let k = order.length - 1; k > 0; k--) {
-    const j = Math.floor(Math.random() * (k + 1));
-    [order[k], order[j]] = [order[j], order[k]];
-  }
-  const dropDelay = new Array(total);
-  order.forEach((origIdx, rank) => { dropDelay[origIdx] = rank * 0.12; });
-
-  let letterIdx = 0;
-  const rows = ROWS.map((chars, ri) => {
-    const rw = rowWidth(chars);
-    let x = -rw / 2;
-    const targetY = ri === 0 ? ROW_Y_TOP : ROW_Y_BOTTOM;
-    const items = [];
-
-    chars.forEach(char => {
-      if (char === " ") {
-        x += GAP;
-        return;
-      }
-      items.push({
-        char,
-        targetX: x + ADV / 2,
-        targetY,
-        delay: dropDelay[letterIdx],
-      });
-      x += ADV;
-      letterIdx++;
-    });
-    return items;
-  });
-
-  return rows.flat();
-}
-
-function Letter({ char, targetX, targetY, delay }) {
-  const groupRef = useRef();
-  const startY   = useMemo(() => 9 + Math.random() * 5, []);
-  const initRotX = useMemo(() => (Math.random() - 0.5) * Math.PI * 3, []);
-  const initRotY = useMemo(() => (Math.random() - 0.5) * Math.PI * 3, []);
-  const initRotZ = useMemo(() => (Math.random() - 0.5) * Math.PI * 1.5, []);
-
-  useFrame(({ clock }) => {
-    const g = groupRef.current;
-    if (!g) return;
-    const elapsed = clock.elapsedTime - delay;
-    if (elapsed <= 0) { g.visible = false; return; }
-    g.visible = true;
-    const t = Math.min(elapsed / 1.2, 1);
-    const e = 1 - Math.pow(1 - t, 3);
-    g.position.y = THREE.MathUtils.lerp(startY, targetY, e);
-    g.rotation.x = THREE.MathUtils.lerp(initRotX, 0, e);
-    g.rotation.y = THREE.MathUtils.lerp(initRotY, 0, e);
-    g.rotation.z = THREE.MathUtils.lerp(initRotZ, 0, e);
-  });
-
-  return (
-    <group ref={groupRef} position={[targetX, startY, 0]} visible={false}>
-      <Text3D
-        font={FONT}
-        size={SZ}
-        height={DEPTH}
-        curveSegments={10}
-        bevelEnabled
-        bevelThickness={0.03}
-        bevelSize={0.018}
-        bevelSegments={5}
-        position={[-ADV * 0.42, -SZ * 0.5, -DEPTH / 2]}
-      >
-        {char}
-        <meshPhysicalMaterial
-          color="#9B7FE8"
-          emissive="#3B1C90"
-          emissiveIntensity={0.3}
-          metalness={0.6}
-          roughness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.08}
-        />
-      </Text3D>
-    </group>
-  );
-}
-
-function Scene({ items }) {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[4, 8, 6]}   intensity={1.8} color="#ffffff" />
-      <directionalLight position={[-6, 4, -4]}  intensity={0.6} color="#aa88ff" />
-      <directionalLight position={[0, -5, 3]}   intensity={0.3} color="#6644bb" />
-      <pointLight       position={[0, 5, 8]}    intensity={0.8} color="#ffffff" />
-      {items.map((item, i) => (
-        <Letter
-          key={`${item.char}-${i}`}
-          char={item.char}
-          targetX={item.targetX}
-          targetY={item.targetY}
-          delay={item.delay}
-        />
-      ))}
-    </>
-  );
-}
+// Lerp helper
+const lp = (a, b, t) => a + (b - a) * t;
 
 export default function LoadingScreen({ onComplete }) {
-  const [exiting, setExiting] = useState(false);
+  const canvasRef = useRef(null);
+  const [fading, setFading] = useState(false);
 
   const reduced = useMemo(
-    () =>
-      typeof window !== "undefined" &&
+    () => typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     []
   );
 
-  const items = useMemo(() => buildLayout(), []);
-
-  const sequenceEnd = useMemo(
-    () => Math.max(...items.map((l) => l.delay)) + 1.2 + 1.0,
-    [items]
-  );
-
+  // ── Three.js setup (runs once after canvas mounts) ─────────
   useEffect(() => {
-    if (reduced) {
-      const t = setTimeout(() => onComplete?.(), 700);
-      return () => clearTimeout(t);
-    }
+    if (reduced) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    let exitTimer, completeTimer;
-    let scheduled = false;
+    const W = document.documentElement.clientWidth  || 1280;
+    const H = document.documentElement.clientHeight || 720;
 
-    const finish = () => {
-      setExiting(true);
-      completeTimer = setTimeout(() => onComplete?.(), 640);
-    };
+    canvas.width  = W;
+    canvas.height = H;
 
-    const schedule = () => {
-      if (scheduled) return;
-      scheduled = true;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 100);
+    camera.position.z = 8;
+
+    const scene = new THREE.Scene();
+
+    // Lights for realistic 3D look
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const d1 = new THREE.DirectionalLight(0xffffff, 2.0);
+    d1.position.set(4, 8, 6); scene.add(d1);
+    const d2 = new THREE.DirectionalLight(0xaa88ff, 0.7);
+    d2.position.set(-6, 4, -4); scene.add(d2);
+    const d3 = new THREE.DirectionalLight(0x6644bb, 0.35);
+    d3.position.set(0, -5, 3); scene.add(d3);
+    const pt = new THREE.PointLight(0xffffff, 1.0);
+    pt.position.set(0, 5, 8); scene.add(pt);
+
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color("#9B7FE8"),
+      emissive: new THREE.Color("#3B1C90"),
+      emissiveIntensity: 0.35,
+      metalness: 0.6,
+      roughness: 0.1,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.08,
+    });
+
+    let rafId;
+    const loader = new FontLoader();
+    loader.load(FONT, (font) => {
+      // ── Compute exact character advance widths from font data ──
+      const res    = font.data.resolution; // e.g. 1000
+      const glyphs = font.data.glyphs;
+      const spaceAdv = (glyphs[" "]?.ha ?? glyphs["A"]?.ha ?? 500) / res * SZ;
+
+      function adv(char) {
+        if (char === " ") return spaceAdv;
+        const g = glyphs[char];
+        return g ? (g.ha / res) * SZ : SZ * 0.6;
+      }
+
+      // ── Build per-row layout with tight, accurate spacing ─────
+      const allItems = [];
+      ROWS.forEach((chars, ri) => {
+        const totalW = chars.reduce((s, c) => s + adv(c), 0);
+        let x = -totalW / 2;
+        chars.forEach(char => {
+          const a = adv(char);
+          if (char !== " ") {
+            allItems.push({ char, targetX: x + a / 2, targetY: ROW_Y[ri], advance: a });
+          }
+          x += a;
+        });
+      });
+
+      // ── Randomise drop order ───────────────────────────────────
+      const total = allItems.length;
+      const order = Array.from({ length: total }, (_, i) => i);
+      for (let k = order.length - 1; k > 0; k--) {
+        const j = Math.floor(Math.random() * (k + 1));
+        [order[k], order[j]] = [order[j], order[k]];
+      }
+      order.forEach((origIdx, rank) => {
+        allItems[origIdx].delay = rank * 0.12;
+      });
+
+      // ── Create one Three.js group per letter ──────────────────
+      const groups = allItems.map(item => {
+        const geom = new TextGeometry(item.char, {
+          font, size: SZ, depth: DEPTH, curveSegments: 10,
+          bevelEnabled: true, bevelThickness: 0.03,
+          bevelSize: 0.018, bevelSegments: 5,
+        });
+        // Centre glyph on group origin
+        geom.translate(-item.advance * 0.5, -SZ * 0.5, -DEPTH / 2);
+
+        const g = new THREE.Group();
+        g.userData = {
+          item,
+          startY: 9 + Math.random() * 5,
+          rx0: (Math.random() - 0.5) * Math.PI * 3,
+          ry0: (Math.random() - 0.5) * Math.PI * 3,
+          rz0: (Math.random() - 0.5) * Math.PI * 1.5,
+        };
+        g.position.set(item.targetX, g.userData.startY, 0);
+        g.visible = false;
+        g.add(new THREE.Mesh(geom, mat));
+        scene.add(g);
+        return g;
+      });
+
+      // ── Exit timing based on animation sequence length ────────
+      const sequenceEnd = Math.max(...allItems.map(l => l.delay)) + FALL + 1.0;
       const wait = Math.min(sequenceEnd * 1000, 7000);
-      exitTimer = setTimeout(finish, wait);
-    };
+      const fadeTimer = setTimeout(() => setFading(true), wait);
+      const doneTimer = setTimeout(() => onComplete?.(), wait + 640);
+      // Store timers so cleanup can clear them
+      canvas._fadeTimer = fadeTimer;
+      canvas._doneTimer = doneTimer;
 
-    if (document.readyState === "complete") {
-      schedule();
-    } else {
-      window.addEventListener("load", schedule);
-    }
+      // ── Animation loop ────────────────────────────────────────
+      const clock = new THREE.Clock();
+      const tick = () => {
+        rafId = requestAnimationFrame(tick);
+        const elapsed = clock.getElapsedTime();
+        groups.forEach(g => {
+          const { item, startY, rx0, ry0, rz0 } = g.userData;
+          const dt = elapsed - item.delay;
+          if (dt <= 0) { g.visible = false; return; }
+          g.visible = true;
+          const t = Math.min(dt / FALL, 1);
+          const e = 1 - Math.pow(1 - t, 3); // ease-out cubic
+          g.position.y = lp(startY, item.targetY, e);
+          g.rotation.x = lp(rx0, 0, e);
+          g.rotation.y = lp(ry0, 0, e);
+          g.rotation.z = lp(rz0, 0, e);
+        });
+        renderer.render(scene, camera);
+      };
+      tick();
+    });
 
     return () => {
-      window.removeEventListener("load", schedule);
-      clearTimeout(exitTimer);
-      clearTimeout(completeTimer);
+      cancelAnimationFrame(rafId);
+      clearTimeout(canvas._fadeTimer);
+      clearTimeout(canvas._doneTimer);
+      mat.dispose();
+      renderer.dispose();
     };
-  }, [onComplete, reduced, sequenceEnd]);
+  }, [reduced, onComplete]);
+
+  // Reduced-motion timing
+  useEffect(() => {
+    if (!reduced) return;
+    const t = setTimeout(() => onComplete?.(), 700);
+    return () => clearTimeout(t);
+  }, [onComplete, reduced]);
 
   if (reduced) {
     return (
@@ -192,30 +189,22 @@ export default function LoadingScreen({ onComplete }) {
   }
 
   return (
-    <AnimatePresence>
-      {!exiting && (
-        <motion.div
-          className="loading-screen"
-          role="status"
-          aria-live="polite"
-          aria-label="Loading"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.64, ease: [0.4, 0, 0.2, 1] }}
-        >
-          <Canvas
-            camera={{ position: [0, 0, 8], fov: 60 }}
-            gl={{ antialias: true, alpha: true }}
-            style={{ position: "absolute", top: 0, left: 0, width: "100vw", height: "100vh" }}
-            onCreated={({ gl }) => gl.setSize(window.innerWidth, window.innerHeight)}
-          >
-            <Suspense fallback={null}>
-              <Scene items={items} />
-            </Suspense>
-          </Canvas>
-          <span className="loading-screen-sr">INDIGO TECH SOLUTION</span>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div
+      className="loading-screen"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading"
+      style={{
+        opacity: fading ? 0 : 1,
+        transition: "opacity 0.64s cubic-bezier(0.4,0,0.2,1)",
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        style={{ display: "block", width: "100%", height: "100%" }}
+        aria-hidden="true"
+      />
+      <span className="loading-screen-sr">INDIGO TECH SOLUTION</span>
+    </div>
   );
 }

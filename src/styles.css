@@ -100,7 +100,7 @@ section.hero.hero-3d{display:block!important;place-items:unset;height:360vh;min-
 .hero-3d-loader-bar{width:120px;height:2px;background:rgba(179,140,255,.2);overflow:hidden}
 .hero-3d-loader-bar i{display:block;height:100%;background:var(--hero-violet)}
 .hero-3d-fallback{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;width:min(160px,30vw);aspect-ratio:1;display:grid;place-items:center;background:transparent}
-.hero-3d-fallback img{width:82%;height:82%;object-fit:contain;opacity:.88;filter:drop-shadow(0 0 18px rgba(179,140,255,.45))}
+.hero-3d-fallback-core{width:82%;height:82%;border-radius:50%;background:radial-gradient(circle at 38% 38%,rgba(179,140,255,.48),rgba(56,0,128,.92) 62%,rgba(28,23,54,.98) 100%);box-shadow:0 0 28px rgba(179,140,255,.16)}
 @media(max-width:900px){
   .nav{height:72px}
   .hero-lockup{font-size:clamp(2.2rem,11vw,3.8rem)}

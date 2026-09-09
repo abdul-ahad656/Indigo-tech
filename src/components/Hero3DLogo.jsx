@@ -257,7 +257,7 @@ function Scene({ triggerRef, onReady }) {
 function FallbackMark() {
   return (
     <div className="hero-3d-fallback">
-      <img src="/assets/indigo-logo.jpg" alt="Indigo Tech Solutions" />
+      <div className="hero-3d-fallback-core" aria-hidden="true" />
     </div>
   );
 }
@@ -309,8 +309,6 @@ export default function Hero3DLogo({ children, back }) {
               {!ready && <LoaderOverlay />}
             </div>
           </HeroErrorBoundary>
-
-          {!ready && <FallbackMark />}
 
           {children}
         </div>
