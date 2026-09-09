@@ -1,41 +1,120 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState, Suspense } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Text3D } from "@react-three/drei";
+import { AnimatePresence, motion } from "framer-motion";
+import * as THREE from "three";
 
-const PHRASE = "INDIGO TECH SOLUTION";
+const WORDS = ["INDIGO", "TECH", "SOLUTION"];
 
-function buildLetters() {
-  // Preserve order so letters land in place and spell the phrase.
-  const chars = PHRASE.split("");
+// Tuned for helvetiker_bold at size SZ=0.65
+const SZ    = 0.65;   // letter height (font size)
+const DEPTH = 0.20;   // extrusion depth
+const ADV   = 0.50;   // advance width per character
+const GAP   = 0.45;   // extra space between words
+const FONT  = "/fonts/helvetiker_bold.typeface.json";
 
-  // Randomize the DROP ORDER (which letter lands first) without
-  // touching visual order — each letter still knows its own position.
-  const dropOrder = chars.map((_, i) => i);
-  for (let k = dropOrder.length - 1; k > 0; k--) {
+function buildLayout() {
+  const totalWidth =
+    WORDS.reduce((s, w) => s + w.length * ADV, 0) +
+    (WORDS.length - 1) * GAP;
+
+  // Assign a random drop order so letters arrive scattered
+  const total = WORDS.reduce((s, w) => s + w.length, 0);
+  const order = Array.from({ length: total }, (_, i) => i);
+  for (let k = order.length - 1; k > 0; k--) {
     const j = Math.floor(Math.random() * (k + 1));
-    [dropOrder[k], dropOrder[j]] = [dropOrder[j], dropOrder[k]];
+    [order[k], order[j]] = [order[j], order[k]];
   }
+  const dropDelay = new Array(total);
+  order.forEach((origIdx, rank) => { dropDelay[origIdx] = rank * 0.11; });
 
-  const perLetterGap = 0.09; // seconds between drops
-  const fallDuration = 1.15;
-
-  return chars.map((char, i) => {
-    const order = dropOrder.indexOf(i);
-    return {
-      char,
-      id: `${char}-${i}`,
-      isSpace: char === " ",
-      delay: order * perLetterGap,
-      duration: fallDuration,
-      // 3D tumble while falling
-      rotateXStart: -180 + Math.random() * 360,
-      rotateYStart: -180 + Math.random() * 360,
-      rotateZStart: -90 + Math.random() * 180,
-      // Random horizontal drift on the way down (settles to 0)
-      driftX: (Math.random() - 0.5) * 60,
-      // Start depth (far from viewer) so it grows as it falls
-      startZ: -600 - Math.random() * 400,
-    };
+  const items = [];
+  let x = -totalWidth / 2;
+  let idx = 0;
+  WORDS.forEach((word, wi) => {
+    word.split("").forEach((char) => {
+      items.push({ char, targetX: x + ADV / 2, delay: dropDelay[idx] });
+      x += ADV;
+      idx++;
+    });
+    if (wi < WORDS.length - 1) x += GAP;
   });
+  return items;
+}
+
+// One extruded 3D letter that falls from above with 3-axis tumble
+function Letter({ char, targetX, delay }) {
+  const groupRef = useRef();
+  const startY   = useMemo(() => 8 + Math.random() * 5, []);
+  const initRotX = useMemo(() => (Math.random() - 0.5) * Math.PI * 3, []);
+  const initRotY = useMemo(() => (Math.random() - 0.5) * Math.PI * 3, []);
+  const initRotZ = useMemo(() => (Math.random() - 0.5) * Math.PI * 1.5, []);
+
+  useFrame(({ clock }) => {
+    const g = groupRef.current;
+    if (!g) return;
+    const elapsed = clock.elapsedTime - delay;
+    if (elapsed <= 0) { g.visible = false; return; }
+    g.visible = true;
+    const t = Math.min(elapsed / 1.35, 1);
+    const e = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    g.position.y = THREE.MathUtils.lerp(startY, 0, e);
+    g.rotation.x = THREE.MathUtils.lerp(initRotX, 0, e);
+    g.rotation.y = THREE.MathUtils.lerp(initRotY, 0, e);
+    g.rotation.z = THREE.MathUtils.lerp(initRotZ, 0, e);
+  });
+
+  return (
+    <group ref={groupRef} position={[targetX, startY, 0]} visible={false}>
+      {/* offset so letter is centered on group origin */}
+      <Text3D
+        font={FONT}
+        size={SZ}
+        height={DEPTH}
+        curveSegments={10}
+        bevelEnabled
+        bevelThickness={0.022}
+        bevelSize={0.014}
+        bevelSegments={5}
+        position={[-ADV * 0.42, -SZ * 0.5, -DEPTH / 2]}
+      >
+        {char}
+        <meshPhysicalMaterial
+          color="#9B7FE8"
+          emissive="#3B1C90"
+          emissiveIntensity={0.22}
+          metalness={0.55}
+          roughness={0.12}
+          clearcoat={1}
+          clearcoatRoughness={0.08}
+        />
+      </Text3D>
+    </group>
+  );
+}
+
+function Scene({ items }) {
+  return (
+    <>
+      {/* Key light */}
+      <directionalLight position={[4, 8, 6]}  intensity={1.6} color="#ffffff" />
+      {/* Fill light — purple tint for depth */}
+      <directionalLight position={[-6, 4, -4]} intensity={0.55} color="#aa88ff" />
+      {/* Rim from below to catch the extrusion edge */}
+      <directionalLight position={[0, -6, 3]}  intensity={0.3}  color="#6644bb" />
+      <ambientLight intensity={0.45} />
+      <pointLight position={[0, 6, 10]} intensity={0.7} color="#ffffff" />
+
+      {items.map((item, i) => (
+        <Letter
+          key={`${item.char}-${i}`}
+          char={item.char}
+          targetX={item.targetX}
+          delay={item.delay}
+        />
+      ))}
+    </>
+  );
 }
 
 export default function LoadingScreen({ onComplete }) {
@@ -48,11 +127,11 @@ export default function LoadingScreen({ onComplete }) {
     []
   );
 
-  const letters = useMemo(() => buildLetters(), []);
+  const items = useMemo(() => buildLayout(), []);
 
   const sequenceEnd = useMemo(
-    () => Math.max(...letters.map((l) => l.delay + l.duration)) + 0.9,
-    [letters]
+    () => Math.max(...items.map((l) => l.delay)) + 1.35 + 0.9,
+    [items]
   );
 
   useEffect(() => {
@@ -72,7 +151,7 @@ export default function LoadingScreen({ onComplete }) {
     const schedule = () => {
       if (scheduled) return;
       scheduled = true;
-      const wait = Math.min(sequenceEnd * 1000, 6000);
+      const wait = Math.min(sequenceEnd * 1000, 6500);
       exitTimer = setTimeout(finish, wait);
     };
 
@@ -96,24 +175,10 @@ export default function LoadingScreen({ onComplete }) {
         role="status"
         aria-live="polite"
       >
-        <span className="loading-screen-static">{PHRASE}</span>
+        <span className="loading-screen-static">INDIGO TECH SOLUTION</span>
       </div>
     );
   }
-
-  // Split phrase into words so we can wrap each word and prevent line breaks
-  // inside a word while still spacing them apart.
-  const words = [];
-  let currentWord = [];
-  letters.forEach((item) => {
-    if (item.isSpace) {
-      if (currentWord.length) words.push(currentWord);
-      currentWord = [];
-    } else {
-      currentWord.push(item);
-    }
-  });
-  if (currentWord.length) words.push(currentWord);
 
   return (
     <AnimatePresence>
@@ -127,52 +192,16 @@ export default function LoadingScreen({ onComplete }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.64, ease: [0.4, 0, 0.2, 1] }}
         >
-          <div className="loading-screen-stage" aria-hidden="true">
-            <div className="loading-screen-phrase">
-              {words.map((word, wi) => (
-                <span key={`w-${wi}`} className="loading-screen-word">
-                  {word.map((item) => (
-                    <motion.span
-                      key={item.id}
-                      className="loading-screen-letter"
-                      initial={{
-                        y: "-70vh",
-                        x: item.driftX,
-                        z: item.startZ,
-                        opacity: 0,
-                        rotateX: item.rotateXStart,
-                        rotateY: item.rotateYStart,
-                        rotateZ: item.rotateZStart,
-                      }}
-                      animate={{
-                        y: 0,
-                        x: 0,
-                        z: 0,
-                        opacity: 1,
-                        rotateX: 0,
-                        rotateY: 0,
-                        rotateZ: 0,
-                      }}
-                      transition={{
-                        delay: item.delay,
-                        duration: item.duration,
-                        ease: [0.22, 1, 0.36, 1],
-                        opacity: {
-                          delay: item.delay,
-                          duration: 0.28,
-                          ease: "linear",
-                        },
-                      }}
-                    >
-                      {item.char}
-                    </motion.span>
-                  ))}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <span className="loading-screen-sr">{PHRASE}</span>
+          <Canvas
+            camera={{ position: [0, 0, 10], fov: 65 }}
+            gl={{ antialias: true, alpha: true }}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          >
+            <Suspense fallback={null}>
+              <Scene items={items} />
+            </Suspense>
+          </Canvas>
+          <span className="loading-screen-sr">INDIGO TECH SOLUTION</span>
         </motion.div>
       )}
     </AnimatePresence>

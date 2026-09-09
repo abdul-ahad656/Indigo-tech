@@ -8,25 +8,25 @@ The hero canvas is a near-black purple, not pure black.
 
 | Token | Hex | Where |
 | --- | --- | --- |
-| `--hero-obsidian` / `--bg-deep` | `#1C1736` | Base fill of `.hero-3d-frame` |
+| `--hero-obsidian` / `--bg-deep` | `#2E2660` | Base fill of `.hero-3d-frame` |
 | `--hero-violet` | `#5A3DB0` | Brand purple glow over the base |
 | `--hero-lavender` | `#B38CFF` | Grid lines, borders, highlights |
 | `--hero-mint` | `#00F5D4` | Small mint glow (bottom right) |
 
 The painted stack in `src/styles.css` on `.hero-3d-frame` is:
 
-1. A centered violet radial glow (`rgba(90, 61, 176, 0.5)`)
-2. A softer violet glow at the bottom (`rgba(90, 61, 176, 0.28)`)
-3. Solid `#1C1736` underneath
+1. A centered violet radial glow (`rgba(90, 61, 176, 0.62)`)
+2. A softer lavender glow at the bottom (`rgba(179, 140, 255, 0.22)`)
+3. Solid `#2E2660` underneath
 
-That is why the hero reads as dark purple rather than flat black. The 3D canvas is transparent, so this CSS background shows through.
+That is why the hero reads as dark purple rather than flat black. The 3D canvas is transparent, so this CSS background shows through. Thin guide lines in `.hero-guides` sit around the mark.
 
 Defined in:
 
-- `src/tokens.css` — `--hero-obsidian: #1c1736`
+- `src/tokens.css` — `--hero-obsidian: #2e2660`
 - `src/styles.css` — `.hero-3d-frame` background
 
-To change the hero look, edit `#1c1736` (base) or the two `rgba(90, 61, 176, …)` glows.
+To change the hero look, edit `#2e2660` (base) or the two radial glows.
 
 ## Rest of the site (light)
 

@@ -10,9 +10,11 @@ function Root() {
   return (
     <>
       {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
-      <div className={loading ? "app-shell is-loading" : "app-shell"} aria-hidden={loading}>
-        <App />
-      </div>
+      {!loading && (
+        <div className="app-shell">
+          <App />
+        </div>
+      )}
     </>
   );
 }
