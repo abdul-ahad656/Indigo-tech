@@ -47,8 +47,8 @@ export const heroServices = [
 ];
 
 const heroWords = ["businesses.", "operations.", "outcomes."];
-const LIGHT = { wght: 200, slnt: -9 };
-const HEAVY = { wght: 800, slnt: 0 };
+const LIGHT = { wght: 250 };
+const HEAVY = { wght: 780 };
 
 function useReducedMotion() {
   return React.useMemo(
@@ -74,10 +74,8 @@ function VariableLine({ parts, active, from, to, staggerFrom = "first", classNam
             key={`${item.ch}-${i}`}
             className={`hero-var-char ${item.className}`.trim()}
             style={{
-              fontWeight: settings.wght,
-              fontStyle: `oblique ${settings.slnt}deg`,
               fontVariationSettings: `'wght' ${settings.wght}`,
-              transitionDelay: reduced ? "0s" : `${order * 0.018}s`
+              transitionDelay: reduced ? "0s" : `${order * 0.01}s`
             }}
           >
             {item.ch === " " ? "\u00a0" : item.ch}

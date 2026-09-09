@@ -265,17 +265,16 @@ function FallbackMark() {
 function HeroGuides() {
   return (
     <svg className="hero-guides" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <g className="hero-guides-glow">
-        <line x1="-80" y1="452" x2="1520" y2="448" />
-        <line x1="718" y1="-60" x2="722" y2="980" />
-        <line x1="-120" y1="70" x2="1560" y2="830" />
-        <line x1="1560" y1="90" x2="-120" y2="810" />
-        <line x1="180" y1="-80" x2="1260" y2="980" />
-        <line x1="180" y1="980" x2="1260" y2="-60" />
-        <line x1="-80" y1="260" x2="1520" y2="640" />
-        <line x1="-80" y1="640" x2="1520" y2="260" />
-        <line x1="420" y1="-90" x2="1020" y2="990" />
-        <line x1="1020" y1="-90" x2="420" y2="990" />
+      <g className="hero-guides-rings" fill="none">
+        <ellipse cx="720" cy="450" rx="168" ry="126" />
+        <ellipse cx="720" cy="450" rx="248" ry="186" />
+        <ellipse cx="720" cy="450" rx="340" ry="255" />
+      </g>
+      <g className="hero-guides-ticks">
+        <line x1="720" y1="292" x2="720" y2="318" />
+        <line x1="720" y1="582" x2="720" y2="608" />
+        <line x1="512" y1="450" x2="538" y2="450" />
+        <line x1="902" y1="450" x2="928" y2="450" />
       </g>
     </svg>
   );
