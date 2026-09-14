@@ -2,17 +2,17 @@ import { useState } from "react";
 import Reveal from "./Reveal";
 
 const NX = {
-  hub: { cx: 218, cy: 192, r: 17, type: "hub",    label: "Core Engine",      desc: "AI orchestration" },
-  a:   { cx: 88,  cy: 82,  r: 8,  type: "violet", label: "AI Models",        desc: "Predictive intelligence" },
-  b:   { cx: 246, cy: 50,  r: 7,  type: "teal",   label: "Analytics",        desc: "Real-time insights" },
-  c:   { cx: 398, cy: 84,  r: 9,  type: "violet", label: "Automation",       desc: "Workflow automation" },
-  d:   { cx: 74,  cy: 196, r: 7,  type: "teal",   label: "Data Ops",         desc: "Pipeline management" },
-  e:   { cx: 352, cy: 164, r: 12, type: "accent", label: "Intelligence Hub", desc: "Decision support" },
-  f:   { cx: 468, cy: 190, r: 6,  type: "blue",   label: "API Layer",        desc: "System integration" },
-  g:   { cx: 110, cy: 318, r: 8,  type: "amber",  label: "BPO Services",     desc: "Human operations" },
-  h:   { cx: 266, cy: 326, r: 10, type: "amber",  label: "Operations",       desc: "24/7 monitoring" },
-  i:   { cx: 418, cy: 308, r: 7,  type: "blue",   label: "Integration",      desc: "Cross-platform sync" },
-  j:   { cx: 482, cy: 102, r: 6,  type: "teal",   label: "Cloud Infra",      desc: "Scalable deployment" },
+  hub: { cx: 300, cy: 200, r: 20, type: "hub",    label: "Core Engine",      desc: "AI orchestration" },
+  a:   { cx: 96,  cy: 72,  r: 9,  type: "violet", label: "AI Models",        desc: "Predictive intelligence" },
+  b:   { cx: 330, cy: 40,  r: 8,  type: "teal",   label: "Analytics",        desc: "Real-time insights" },
+  c:   { cx: 560, cy: 68,  r: 10, type: "violet", label: "Automation",       desc: "Workflow automation" },
+  d:   { cx: 64,  cy: 205, r: 8,  type: "teal",   label: "Data Ops",         desc: "Pipeline management" },
+  e:   { cx: 500, cy: 175, r: 14, type: "accent", label: "Intelligence Hub", desc: "Decision support" },
+  f:   { cx: 680, cy: 200, r: 7,  type: "blue",   label: "API Layer",        desc: "System integration" },
+  g:   { cx: 120, cy: 340, r: 9,  type: "amber",  label: "BPO Services",     desc: "Human operations" },
+  h:   { cx: 340, cy: 348, r: 11, type: "amber",  label: "Operations",       desc: "24/7 monitoring" },
+  i:   { cx: 590, cy: 330, r: 8,  type: "blue",   label: "Integration",      desc: "Cross-platform sync" },
+  j:   { cx: 700, cy: 88,  r: 7,  type: "teal",   label: "Cloud Infra",      desc: "Scalable deployment" },
 };
 
 const TS = {
@@ -54,16 +54,19 @@ const PACKETS = [
 ];
 
 const BADGES = [
-  { x: 18,  y: 130, label: "UPTIME",    value: "99.9%",   accent: "#00f5d4" },
-  { x: 348, y: 14,  label: "ACCURACY",  value: "97.4%",   accent: "#b38cff" },
-  { x: 336, y: 228, label: "RESPONSE",  value: "< 2 min", accent: "#7090e0" },
-  { x: 18,  y: 294, label: "OPS / DAY", value: "12K+",    accent: "#ffc53d" },
+  { x: 28,  y: 108, label: "UPTIME",    value: "99.9%",   accent: "#00f5d4" },
+  { x: 560, y: 18,  label: "ACCURACY",  value: "97.4%",   accent: "#b38cff" },
+  { x: 548, y: 228, label: "RESPONSE",  value: "< 2 min", accent: "#7090e0" },
+  { x: 28,  y: 262, label: "OPS / DAY", value: "12K+",    accent: "#ffc53d" },
 ];
 
-const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
+const VB_W = 760;
+const VB_H = 400;
+
+const PARTICLES = Array.from({ length: 24 }, (_, i) => ({
   id: i,
-  cx: 18 + (i * 29 + i * i * 7) % 504,
-  y0: 40 + (i * 43 + i * 17) % 310,
+  cx: 24 + (i * 37 + i * i * 5) % (VB_W - 48),
+  y0: 36 + (i * 47 + i * 19) % (VB_H - 70),
   r: 1 + (i % 3) * 0.65,
   color: ["#b38cff","#00f5d4","#ffc53d","#90b4ff"][i % 4],
   dur: `${11 + (i % 5) * 2.4}s`,
@@ -111,7 +114,8 @@ export default function VideoSection() {
 
         <svg
           className="ops-network"
-          viewBox="0 0 540 380"
+          viewBox={`0 0 ${VB_W} ${VB_H}`}
+          preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg"
           aria-label="Interactive technology network diagram"
         >
@@ -149,21 +153,21 @@ export default function VideoSection() {
           ))}
 
           {/* Hub orbit rings */}
-          <circle cx={NX.hub.cx} cy={NX.hub.cy} r="28" fill="none"
+          <circle cx={NX.hub.cx} cy={NX.hub.cy} r="32" fill="none"
             stroke="#5a3db0" strokeWidth="0.9" strokeOpacity="0.28" strokeDasharray="3 7"
             className="vhub-orbit" />
-          <circle cx={NX.hub.cx} cy={NX.hub.cy} r="46" fill="none"
+          <circle cx={NX.hub.cx} cy={NX.hub.cy} r="54" fill="none"
             stroke="#b38cff" strokeWidth="0.7" strokeOpacity="0.14" strokeDasharray="4 10"
             className="vhub-orbit-slow" />
 
           {/* Orbiting dots */}
           <circle r="4" fill="#00f5d4" filter="url(#vglow-sm)">
             <animateMotion dur="8s" repeatCount="indefinite"
-              path={`M ${218+28},${192} a 28,28 0 0,1 -56,0 a 28,28 0 0,1 56,0`} />
+              path={`M ${NX.hub.cx + 32},${NX.hub.cy} a 32,32 0 0,1 -64,0 a 32,32 0 0,1 64,0`} />
           </circle>
           <circle r="3" fill="#ffc53d" filter="url(#vglow-sm)">
             <animateMotion dur="14s" begin="-4s" repeatCount="indefinite"
-              path={`M ${218+46},${192} a 46,46 0 0,0 -92,0 a 46,46 0 0,0 92,0`} />
+              path={`M ${NX.hub.cx + 54},${NX.hub.cy} a 54,54 0 0,0 -108,0 a 54,54 0 0,0 108,0`} />
           </circle>
 
           {/* Edges */}
@@ -256,12 +260,12 @@ export default function VideoSection() {
           {/* Metric badges */}
           {BADGES.map((b, i) => (
             <g key={i} className="vbadge" style={{ "--vbadge-delay": `${i * 0.28}s` }}>
-              <rect x={b.x} y={b.y} width="98" height="48" rx="11"
+              <rect x={b.x} y={b.y} width="102" height="44" rx="10"
                 fill="white" fillOpacity="0.97" stroke={b.accent} strokeWidth="1.5" />
-              <rect x={b.x} y={b.y} width="4" height="48" rx="2" fill={b.accent} />
-              <text x={b.x + 13} y={b.y + 16} fontSize="7.5" fill="#8e86a8"
+              <rect x={b.x} y={b.y} width="4" height="44" rx="2" fill={b.accent} />
+              <text x={b.x + 14} y={b.y + 17} fontSize="7.5" fill="#8e86a8"
                 fontFamily="DM Mono, monospace" letterSpacing="0.1em">{b.label}</text>
-              <text x={b.x + 13} y={b.y + 36} fontSize="17" fontWeight="700" fill="#0b0820"
+              <text x={b.x + 14} y={b.y + 34} fontSize="16" fontWeight="700" fill="#0b0820"
                 fontFamily="Inter Tight, Inter, sans-serif" letterSpacing="-0.055em">{b.value}</text>
             </g>
           ))}
@@ -270,7 +274,7 @@ export default function VideoSection() {
           {hovered && (() => {
             const n = NX[hovered];
             const ttW = 126;
-            const ttX = Math.max(4, Math.min(n.cx - ttW / 2, 540 - ttW - 4));
+            const ttX = Math.max(4, Math.min(n.cx - ttW / 2, VB_W - ttW - 4));
             const ttBelow = n.cy - n.r - 48 < 8;
             const ttY = ttBelow ? n.cy + n.r + 8 : n.cy - n.r - 48;
             const accent = ACCENT_COLOR[n.type];
