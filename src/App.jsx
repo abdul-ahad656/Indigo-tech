@@ -4,10 +4,7 @@ import Hero3DLogo from "./components/Hero3DLogo";
 import HeroPinStory, { HeroImpact } from "./components/HeroPinStory";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
-import CapabilitiesTicker from "./components/CapabilitiesTicker";
 import AboutServicesJourney from "./components/AboutServicesJourney";
-import VideoSection from "./components/VideoSection";
-import TeamSection from "./components/TeamSection";
 import FeedbackSection from "./components/FeedbackSection";
 import ContactSection from "./components/ContactSection";
 
@@ -54,9 +51,6 @@ export default function App() {
 
         <div className="page-stack">
           <AboutServicesJourney />
-          <CapabilitiesTicker />
-          <VideoSection />
-          <TeamSection />
           <FeedbackSection />
           <ContactSection />
         </div>

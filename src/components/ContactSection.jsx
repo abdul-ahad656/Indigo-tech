@@ -8,7 +8,7 @@ export default function ContactSection() {
       <div className="contact-card">
         <div className="contact-glow" />
         <Reveal>
-          <div className="section-label">06 — LET'S WORK</div>
+          <div className="section-label">05 — LET'S WORK</div>
           <h2>Bring us the<br /><em>next challenge.</em></h2>
           <p>
             Need a BPO partner, dispatch team, customer support operation, lead-generation

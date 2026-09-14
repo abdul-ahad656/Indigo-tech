@@ -1,9 +1,9 @@
 import { capabilities } from "../data/site";
 
-/** Capabilities footer for Services — carousel lives in the About→Services pin viewport */
+/** Capabilities block — sits on the sliding services exit panel */
 export default function ServicesSection() {
   return (
-    <section className="section services-section" aria-label="Operations we support">
+    <section className="services-section" aria-label="Operations we support">
       <div className="services-shell">
         <div className="capability-wrap">
           <span className="micro-label">OPERATIONS WE SUPPORT</span>

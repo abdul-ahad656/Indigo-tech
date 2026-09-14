@@ -5,7 +5,7 @@ import Reveal from "./Reveal";
 export default function FeedbackSection() {
   return (
     <section id="feedback" className="section feedback-section">
-      <div className="section-label">05 — CLIENT FEEDBACK</div>
+      <div className="section-label">04 — CLIENT FEEDBACK</div>
       <Reveal>
         <div className="section-heading">
           <h2>Built on<br /><em>responsiveness.</em></h2>

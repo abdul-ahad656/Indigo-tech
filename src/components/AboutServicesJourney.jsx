@@ -4,6 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import AboutSection from "./AboutSection";
 import ServicesSection from "./ServicesSection";
+import CapabilitiesTicker from "./CapabilitiesTicker";
+import VideoSection from "./VideoSection";
 import { heroServices } from "./HeroPinStory";
 
 if (typeof window !== "undefined") {
@@ -43,6 +45,8 @@ export default function AboutServicesJourney() {
       const viewport = root.querySelector(".strip-carousel-viewport");
       const track = root.querySelector(".strip-carousel-track");
       const cards = root.querySelectorAll(".service-card-slide");
+      const exitTrack = root.querySelector(".services-exit-track");
+      const exitPanel = root.querySelector(".services-exit-panel");
 
       gsap.set(bands, { scaleY: 0, transformOrigin: "50% 50%" });
       gsap.set(blinds, { gap: "5vh" });
@@ -71,6 +75,7 @@ export default function AboutServicesJourney() {
       });
       if (track) gsap.set(track, { x: 0 });
       if (cards.length) gsap.set(cards, { autoAlpha: 0.4 });
+      if (exitPanel) gsap.set(exitPanel, { x: 0 });
 
       const getCarouselTravel = () => {
         if (!track || !viewport) return window.innerWidth;
@@ -90,10 +95,8 @@ export default function AboutServicesJourney() {
         },
       });
 
-      // 1) Hold finished About
       tl.to({}, { duration: 0.1 }, 0);
 
-      // 2) Dark strips expand over About
       tl.to(
         bands,
         {
@@ -105,7 +108,8 @@ export default function AboutServicesJourney() {
       );
       tl.to(blinds, { gap: 0, duration: 0.28 }, 0.1);
 
-      // 3) Services intro appears centered in this viewport
+      // Keep strip-pin dark once services stage takes over (kills lavender flash/gap)
+      tl.to(pin, { backgroundColor: "#2e2660", duration: 0.08 }, 0.34);
       tl.to(stage, { autoAlpha: 1, duration: 0.08 }, 0.34);
       tl.to(label, { y: 0, autoAlpha: 1, duration: 0.1 }, 0.36);
       tl.to(
@@ -121,7 +125,6 @@ export default function AboutServicesJourney() {
       tl.to(lede, { y: 0, autoAlpha: 1, duration: 0.12 }, 0.46);
       tl.to({}, { duration: 0.08 }, 0.54);
 
-      // 4) Intro slides left — carousel enters from the right (same viewport)
       tl.to(
         intro,
         {
@@ -184,7 +187,6 @@ export default function AboutServicesJourney() {
         0.6
       );
 
-      // 5) Carousel advances while text stays on the left
       tl.to(
         track,
         {
@@ -194,6 +196,27 @@ export default function AboutServicesJourney() {
         0.72
       );
       tl.to({}, { duration: 0.08 }, 0.92);
+
+      // Services panel slides left — next section revealed underneath
+      if (exitTrack && exitPanel) {
+        gsap.fromTo(
+          exitPanel,
+          { xPercent: 0 },
+          {
+            xPercent: -100,
+            ease: "none",
+            scrollTrigger: {
+              trigger: exitTrack,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: 0.55,
+              pin: false,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          }
+        );
+      }
     }, root);
 
     const onResize = () => ScrollTrigger.refresh();
@@ -275,8 +298,19 @@ export default function AboutServicesJourney() {
         </div>
       </div>
 
-      <div id="services" className="services-chapter">
-        <ServicesSection />
+      {/* Dark continuous services footer → slides left to reveal next section beneath */}
+      <div id="services" className="services-exit">
+        <div className="services-exit-track">
+          <div className="services-exit-sticky">
+            <div className="services-exit-under">
+              <CapabilitiesTicker />
+              <VideoSection />
+            </div>
+            <div className="services-exit-panel">
+              <ServicesSection />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
