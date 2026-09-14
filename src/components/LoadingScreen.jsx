@@ -1,210 +1,231 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import * as THREE from "three";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
-import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, animate } from "framer-motion";
 
-// Two-row layout built dynamically once font loads
-const ROWS = [
-  ["I","N","D","I","G","O"," ","T","E","C","H"],
-  ["S","O","L","U","T","I","O","N"],
+const DURATION = 2.5;
+const EXIT_MS = 0.85;
+const FILL = "#1A1A1A";
+const WORDS = ["INSPIRE", "INNOVATE", "IMPACT"];
+
+/**
+ * Exact 2D projection of public/models/logo.glb
+ * — ring: outer R=0.907, inner R=0.618, open on the left (−90° → +90° via +X)
+ * — chips 1–17: world centers & half-extents from the GLB
+ * viewBox maps world (−1..1) → (0..200), Y flipped for SVG.
+ */
+const RING_FILL =
+  "M 100 190.7 A 90.7 90.7 0 0 0 100 9.3 L 100 38.2 A 61.8 61.8 0 0 1 100 161.8 Z";
+
+const RING_STROKE = "M 100 176.25 A 76.25 76.25 0 0 0 100 23.75";
+
+const CHIPS = [
+  { i: 1, x: 128, y: 62.4, s: 42.4, rx: 6.78 },
+  { i: 2, x: 101.28, y: 100.08, s: 41.2, rx: 6.59 },
+  { i: 3, x: 62.56, y: 59.6, s: 39.12, rx: 6.26 },
+  { i: 4, x: 20.88, y: 59.6, s: 31.6, rx: 5.06 },
+  { i: 5, x: 17.92, y: 104.24, s: 37.44, rx: 5.99 },
+  { i: 6, x: 52.16, y: 23.36, s: 31.6, rx: 5.06 },
+  { i: 7, x: 32.56, y: 40, s: 19.12, rx: 3.06 },
+  { i: 8, x: 9.6, y: 88.8, s: 17.44, rx: 2.79 },
+  { i: 9, x: 56.32, y: 153.36, s: 31.6, rx: 5.06 },
+  { i: 10, x: 33.36, y: 145.84, s: 18.24, rx: 2.92 },
+  { i: 11, x: 65.44, y: 103.36, s: 21.6, rx: 3.46 },
+  { i: 12, x: 86.47, y: 11.83, s: 12.1, rx: 1.94 },
+  { i: 13, x: 89.1, y: 43.26, s: 9.32, rx: 1.49 },
+  { i: 14, x: 67.02, y: 136.14, s: 9.32, rx: 1.49 },
+  { i: 15, x: 86.37, y: 137.57, s: 13.98, rx: 2.24 },
+  { i: 16, x: 89.15, y: 164.11, s: 8.42, rx: 1.35 },
+  { i: 17, x: 51.73, y: 53.81, s: 6.54, rx: 1.1 },
 ];
-const ROW_Y = [0.6, -0.6];
-const SZ    = 1.0;    // font size (letter height)
-const DEPTH = 0.28;   // extrusion depth
-const FALL  = 1.25;   // fall duration (s)
-const FONT  = "/fonts/helvetiker_bold.typeface.json";
 
-// Lerp helper
-const lp = (a, b, t) => a + (b - a) * t;
+function CropMarks() {
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {["left-0 top-0", "right-0 top-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
+        <span key={pos} className={`absolute h-3.5 w-3.5 ${pos}`}>
+          <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-[#8a8a8a]" />
+          <span className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-[#8a8a8a]" />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function IndigoMarkSvg({ progress }) {
+  const draw = Math.min(1, progress / 0.68);
+  const fillOpacity = Math.max(0, Math.min(1, (progress - 0.28) / 0.62));
+
+  return (
+    <svg
+      viewBox="0 0 200 200"
+      className="h-full w-full overflow-visible"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      {/* Ring stroke draw (matches GLB ring thickness) */}
+      <motion.path
+        d={RING_STROKE}
+        stroke={FILL}
+        strokeWidth="28.9"
+        strokeLinecap="butt"
+        fill="none"
+        initial={{ pathLength: 0, opacity: 1 }}
+        animate={{
+          pathLength: draw,
+          opacity: Math.max(0, 1 - fillOpacity * 1.15),
+        }}
+        transition={{ duration: 0.04, ease: "linear" }}
+      />
+
+      {/* Solid ring fill once stroke has mostly drawn */}
+      <motion.path
+        d={RING_FILL}
+        fill={FILL}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: fillOpacity }}
+        transition={{ duration: 0.04, ease: "linear" }}
+      />
+
+      {/* Chips 1–17 — exact GLB positions / sizes */}
+      {CHIPS.map((chip) => (
+        <motion.rect
+          key={chip.i}
+          x={chip.x}
+          y={chip.y}
+          width={chip.s}
+          height={chip.s}
+          rx={chip.rx}
+          ry={chip.rx}
+          stroke={FILL}
+          strokeWidth="1.4"
+          initial={{ pathLength: 0, fillOpacity: 0 }}
+          animate={{ pathLength: draw, fill: FILL, fillOpacity }}
+          transition={{ duration: 0.04, ease: "linear" }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+function formatPct(value) {
+  const n = Math.round(value);
+  if (n >= 100) return "100";
+  return String(Math.max(0, n)).padStart(2, "0");
+}
 
 export default function LoadingScreen({ onComplete }) {
-  const canvasRef = useRef(null);
-  const [fading, setFading] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [pct, setPct] = useState(0);
+  const [exiting, setExiting] = useState(false);
+  const progress = useMotionValue(0);
 
-  const reduced = useMemo(
-    () => typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    []
-  );
+  useMotionValueEvent(progress, "change", (latest) => {
+    setPct(latest * 100);
+  });
 
-  // ── Three.js setup (runs once after canvas mounts) ─────────
   useEffect(() => {
-    if (reduced) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    document.documentElement.classList.add("preloader-active");
+    document.body.classList.add("preloader-active");
 
-    const W = document.documentElement.clientWidth  || 1280;
-    const H = document.documentElement.clientHeight || 720;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    canvas.width  = W;
-    canvas.height = H;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(W, H);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 100);
-    camera.position.z = 8;
-
-    const scene = new THREE.Scene();
-
-    // Lights for realistic 3D look
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const d1 = new THREE.DirectionalLight(0xffffff, 2.0);
-    d1.position.set(4, 8, 6); scene.add(d1);
-    const d2 = new THREE.DirectionalLight(0xaa88ff, 0.7);
-    d2.position.set(-6, 4, -4); scene.add(d2);
-    const d3 = new THREE.DirectionalLight(0x6644bb, 0.35);
-    d3.position.set(0, -5, 3); scene.add(d3);
-    const pt = new THREE.PointLight(0xffffff, 1.0);
-    pt.position.set(0, 5, 8); scene.add(pt);
-
-    const mat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color("#9B7FE8"),
-      emissive: new THREE.Color("#3B1C90"),
-      emissiveIntensity: 0.35,
-      metalness: 0.6,
-      roughness: 0.1,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
-    });
-
-    let rafId;
-    const loader = new FontLoader();
-    loader.load(FONT, (font) => {
-      // ── Compute exact character advance widths from font data ──
-      const res    = font.data.resolution; // e.g. 1000
-      const glyphs = font.data.glyphs;
-      const spaceAdv = (glyphs[" "]?.ha ?? glyphs["A"]?.ha ?? 500) / res * SZ;
-
-      function adv(char) {
-        if (char === " ") return spaceAdv;
-        const g = glyphs[char];
-        return g ? (g.ha / res) * SZ : SZ * 0.6;
-      }
-
-      // ── Build per-row layout with tight, accurate spacing ─────
-      const allItems = [];
-      ROWS.forEach((chars, ri) => {
-        const totalW = chars.reduce((s, c) => s + adv(c), 0);
-        let x = -totalW / 2;
-        chars.forEach(char => {
-          const a = adv(char);
-          if (char !== " ") {
-            allItems.push({ char, targetX: x + a / 2, targetY: ROW_Y[ri], advance: a });
-          }
-          x += a;
-        });
-      });
-
-      // ── Randomise drop order ───────────────────────────────────
-      const total = allItems.length;
-      const order = Array.from({ length: total }, (_, i) => i);
-      for (let k = order.length - 1; k > 0; k--) {
-        const j = Math.floor(Math.random() * (k + 1));
-        [order[k], order[j]] = [order[j], order[k]];
-      }
-      order.forEach((origIdx, rank) => {
-        allItems[origIdx].delay = rank * 0.12;
-      });
-
-      // ── Create one Three.js group per letter ──────────────────
-      const groups = allItems.map(item => {
-        const geom = new TextGeometry(item.char, {
-          font, size: SZ, depth: DEPTH, curveSegments: 10,
-          bevelEnabled: true, bevelThickness: 0.03,
-          bevelSize: 0.018, bevelSegments: 5,
-        });
-        // Centre glyph on group origin
-        geom.translate(-item.advance * 0.5, -SZ * 0.5, -DEPTH / 2);
-
-        const g = new THREE.Group();
-        g.userData = {
-          item,
-          startY: 9 + Math.random() * 5,
-          rx0: (Math.random() - 0.5) * Math.PI * 3,
-          ry0: (Math.random() - 0.5) * Math.PI * 3,
-          rz0: (Math.random() - 0.5) * Math.PI * 1.5,
-        };
-        g.position.set(item.targetX, g.userData.startY, 0);
-        g.visible = false;
-        g.add(new THREE.Mesh(geom, mat));
-        scene.add(g);
-        return g;
-      });
-
-      // ── Exit timing based on animation sequence length ────────
-      const sequenceEnd = Math.max(...allItems.map(l => l.delay)) + FALL + 1.0;
-      const wait = Math.min(sequenceEnd * 1000, 7000);
-      const fadeTimer = setTimeout(() => setFading(true), wait);
-      const doneTimer = setTimeout(() => onComplete?.(), wait + 640);
-      // Store timers so cleanup can clear them
-      canvas._fadeTimer = fadeTimer;
-      canvas._doneTimer = doneTimer;
-
-      // ── Animation loop ────────────────────────────────────────
-      const clock = new THREE.Clock();
-      const tick = () => {
-        rafId = requestAnimationFrame(tick);
-        const elapsed = clock.getElapsedTime();
-        groups.forEach(g => {
-          const { item, startY, rx0, ry0, rz0 } = g.userData;
-          const dt = elapsed - item.delay;
-          if (dt <= 0) { g.visible = false; return; }
-          g.visible = true;
-          const t = Math.min(dt / FALL, 1);
-          const e = 1 - Math.pow(1 - t, 3); // ease-out cubic
-          g.position.y = lp(startY, item.targetY, e);
-          g.rotation.x = lp(rx0, 0, e);
-          g.rotation.y = lp(ry0, 0, e);
-          g.rotation.z = lp(rz0, 0, e);
-        });
-        renderer.render(scene, camera);
+    if (reduced) {
+      progress.set(1);
+      const t = window.setTimeout(() => {
+        setVisible(false);
+        onComplete?.();
+      }, 300);
+      return () => {
+        clearTimeout(t);
+        document.documentElement.classList.remove("preloader-active");
+        document.body.classList.remove("preloader-active");
       };
-      tick();
+    }
+
+    const controls = animate(progress, 1, {
+      duration: DURATION,
+      ease: [0.22, 0.61, 0.36, 1],
+      onComplete: () => {
+        setExiting(true);
+        window.setTimeout(() => {
+          setVisible(false);
+          onComplete?.();
+        }, EXIT_MS * 1000);
+      },
     });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(canvas._fadeTimer);
-      clearTimeout(canvas._doneTimer);
-      mat.dispose();
-      renderer.dispose();
+      controls.stop();
+      document.documentElement.classList.remove("preloader-active");
+      document.body.classList.remove("preloader-active");
     };
-  }, [reduced, onComplete]);
-
-  // Reduced-motion timing
-  useEffect(() => {
-    if (!reduced) return;
-    const t = setTimeout(() => onComplete?.(), 700);
-    return () => clearTimeout(t);
-  }, [onComplete, reduced]);
-
-  if (reduced) {
-    return (
-      <div className="loading-screen loading-screen--reduced" role="status" aria-live="polite">
-        <span className="loading-screen-static">INDIGO TECH SOLUTION</span>
-      </div>
-    );
-  }
+  }, [onComplete, progress]);
 
   return (
-    <div
-      className="loading-screen"
-      role="status"
-      aria-live="polite"
-      aria-label="Loading"
-      style={{
-        opacity: fading ? 0 : 1,
-        transition: "opacity 0.64s cubic-bezier(0.4,0,0.2,1)",
+    <AnimatePresence
+      onExitComplete={() => {
+        document.documentElement.classList.remove("preloader-active");
+        document.body.classList.remove("preloader-active");
       }}
     >
-      <canvas
-        ref={canvasRef}
-        style={{ display: "block", width: "100%", height: "100%" }}
-        aria-hidden="true"
-      />
-      <span className="loading-screen-sr">INDIGO TECH SOLUTION</span>
-    </div>
+      {visible && (
+        <motion.div
+          key="indigo-preloader"
+          role="status"
+          aria-live="polite"
+          aria-label={`Loading ${formatPct(pct)} percent`}
+          className="fixed inset-0 z-[300] flex touch-none items-center justify-center bg-[#E5E5E5]"
+          initial={{ opacity: 1, y: 0 }}
+          animate={
+            exiting
+              ? { opacity: 0, y: "-8%", transition: { duration: EXIT_MS, ease: [0.4, 0, 0.2, 1] } }
+              : { opacity: 1, y: 0 }
+          }
+          exit={{ opacity: 0, y: "-10%", transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] } }}
+        >
+          <div className="flex w-[min(86vw,360px)] flex-col items-center gap-[clamp(1.25rem,3vh,2rem)]">
+            <div className="relative grid aspect-square w-[min(58vw,240px)] place-items-center">
+              <CropMarks />
+              <div className="relative aspect-square w-[86%]">
+                <IndigoMarkSvg progress={pct / 100} />
+              </div>
+            </div>
+
+            <p className="flex flex-wrap items-center justify-center gap-x-[clamp(0.65rem,2vw,1.35rem)] gap-y-1 font-['DM_Mono',ui-monospace,monospace] text-[clamp(9px,1.05vw,11px)] font-medium uppercase tracking-[0.28em] text-[#2a2a2a]">
+              {WORDS.map((word, i) => (
+                <React.Fragment key={word}>
+                  {i > 0 && (
+                    <span className="tracking-normal opacity-40" aria-hidden="true">
+                      ·
+                    </span>
+                  )}
+                  <motion.span
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.18 + i * 0.08, duration: 0.45, ease: "easeOut" }}
+                  >
+                    {word}
+                  </motion.span>
+                </React.Fragment>
+              ))}
+            </p>
+
+            <motion.div
+              className="min-h-[1.2em] font-['DM_Mono',ui-monospace,monospace] text-[clamp(12px,1.4vw,14px)] font-medium tabular-nums tracking-[0.2em] text-[#1A1A1A]"
+              aria-hidden="true"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.45 }}
+            >
+              {formatPct(pct)}
+            </motion.div>
+          </div>
+
+          <span className="sr-only">Indigo Tech Solutions</span>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -9,12 +9,13 @@ function Root() {
 
   return (
     <>
+      <div
+        className={`app-shell${loading ? " is-loading preloader-active" : ""}`}
+        aria-hidden={loading || undefined}
+      >
+        <App />
+      </div>
       {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
-      {!loading && (
-        <div className="app-shell">
-          <App />
-        </div>
-      )}
     </>
   );
 }
