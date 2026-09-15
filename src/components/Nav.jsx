@@ -5,11 +5,11 @@ export default function Nav({ scrolled, open, setOpen, onNavigate, onPage }) {
     <nav className={`nav ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""} ${onPage ? "is-on-page" : ""}`}>
       <button className="brand" onClick={() => onNavigate("top")} aria-label="Go home">
         <img src="/assets/indigo-mark.png" alt="" />
-        <span>INDIGO TECH SOLUTION</span>
+        <span>INDIGO TECH SOLUTIONS</span>
       </button>
 
       <div className="nav-end">
-        <button className="nav-talk" onClick={() => onNavigate("contact")}>Let's talk</button>
+        <button className="nav-talk" onClick={() => onNavigate("contact")}>Email us</button>
         <button
           className="nav-menu"
           onClick={() => setOpen((value) => !value)}

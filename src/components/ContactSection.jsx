@@ -8,20 +8,20 @@ export default function ContactSection() {
       <div className="contact-card">
         <div className="contact-glow" />
         <Reveal>
-          <div className="section-label">05 — LET'S WORK</div>
-          <h2>Bring us the<br /><em>next challenge.</em></h2>
+          <div className="section-label">05 · START A DESK</div>
+          <h2>Tell us what<br /><em>is breaking.</em></h2>
           <p>
-            Need a BPO partner, dispatch team, customer support operation, lead-generation
-            team or remote business support? Talk directly with Indigo Tech Solutions.
+            Dispatch backlog, inbox pile-up, calendars slipping, books behind.
+            Email or call and we will say whether we can take the seat.
           </p>
           <div className="contact-actions">
             <a className="primary" href={`mailto:${company.email}`}><Mail size={18} /> Email Indigo</a>
-            <a className="secondary dark-secondary" href={`tel:${company.phone}`}><Phone size={17} /> Call us</a>
+            <a className="secondary dark-secondary" href={`tel:${company.phone}`}><Phone size={17} /> Call the desk</a>
           </div>
           <div className="contact-meta">
             <span><MapPin size={16} /> {company.location}</span>
-            <span><Clock3 size={16} /> Remote operations</span>
-            <span><ShieldCheck size={16} /> Business support</span>
+            <span><Clock3 size={16} /> Remote coverage</span>
+            <span><ShieldCheck size={16} /> Named account lead</span>
           </div>
         </Reveal>
       </div>

@@ -5,7 +5,7 @@ import { feedback, feedbackCategories } from "../data/site";
 
 const SPRING = { type: "spring", stiffness: 280, damping: 24, mass: 0.85 };
 
-/** Deterministic scatter slots (% of canvas) — reshuffled per filter */
+/** Deterministic scatter slots (% of canvas)  -  reshuffled per filter */
 const SLOT_BANK = [
   { left: 2, top: 6, rotate: -4, w: 300 },
   { left: 36, top: 2, rotate: 3, w: 280 },
@@ -18,9 +18,9 @@ const SLOT_BANK = [
 
 const FILTER_OFFSETS = {
   All: [0, 1, 2, 3, 4, 5, 6],
-  Enterprise: [1, 3, 5, 0, 2, 4, 6],
-  Design: [2, 4, 6, 1, 3, 5, 0],
-  Growth: [4, 0, 5, 2, 6, 1, 3],
+  Dispatch: [1, 3, 5, 0, 2, 4, 6],
+  Support: [2, 4, 6, 1, 3, 5, 0],
+  BPO: [4, 0, 5, 2, 6, 1, 3],
 };
 
 function useIsDesktop() {
@@ -253,7 +253,7 @@ export default function FeedbackSection() {
         <div className="mb-8 flex flex-col gap-6 md:mb-10 md:flex-row md:items-end md:justify-between">
           <div className="max-w-[640px]">
             <p className="mb-5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-[#71717A]">
-              04 — Client Feedback
+              04 · Client Feedback
             </p>
             <motion.h2
               id="testimonials-heading"
@@ -263,9 +263,9 @@ export default function FeedbackSection() {
               transition={SPRING}
               className="font-display m-0 text-[clamp(2.6rem,5.5vw,4.8rem)] font-bold leading-[0.92] tracking-[-0.07em]"
             >
-              Voices from the
+              Quotes we will
               <br />
-              <em className="not-italic text-[#B38CFF]">floating floor</em>
+              <em className="not-italic text-[#B38CFF]">publish for real</em>
             </motion.h2>
           </div>
 
@@ -332,7 +332,7 @@ export default function FeedbackSection() {
 
           {desktop && (
             <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#52525B]">
-              Drag cards · Filter to reshuffle
+              Sample cards · Drag freely · Filter to reshuffle
             </p>
           )}
         </div>

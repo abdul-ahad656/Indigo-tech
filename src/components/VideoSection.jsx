@@ -2,17 +2,17 @@ import { useState } from "react";
 import Reveal from "./Reveal";
 
 const NX = {
-  hub: { cx: 300, cy: 200, r: 20, type: "hub",    label: "Core Engine",      desc: "AI orchestration" },
-  a:   { cx: 96,  cy: 72,  r: 9,  type: "violet", label: "AI Models",        desc: "Predictive intelligence" },
-  b:   { cx: 330, cy: 40,  r: 8,  type: "teal",   label: "Analytics",        desc: "Real-time insights" },
-  c:   { cx: 560, cy: 68,  r: 10, type: "violet", label: "Automation",       desc: "Workflow automation" },
-  d:   { cx: 64,  cy: 205, r: 8,  type: "teal",   label: "Data Ops",         desc: "Pipeline management" },
-  e:   { cx: 500, cy: 175, r: 14, type: "accent", label: "Intelligence Hub", desc: "Decision support" },
-  f:   { cx: 680, cy: 200, r: 7,  type: "blue",   label: "API Layer",        desc: "System integration" },
-  g:   { cx: 120, cy: 340, r: 9,  type: "amber",  label: "BPO Services",     desc: "Human operations" },
-  h:   { cx: 340, cy: 348, r: 11, type: "amber",  label: "Operations",       desc: "24/7 monitoring" },
-  i:   { cx: 590, cy: 330, r: 8,  type: "blue",   label: "Integration",      desc: "Cross-platform sync" },
-  j:   { cx: 700, cy: 88,  r: 7,  type: "teal",   label: "Cloud Infra",      desc: "Scalable deployment" },
+  hub: { cx: 300, cy: 200, r: 20, type: "hub",    label: "Ops Desk",         desc: "Named queue owner" },
+  a:   { cx: 96,  cy: 72,  r: 9,  type: "violet", label: "Ticket Rules",     desc: "How work gets triaged" },
+  b:   { cx: 330, cy: 40,  r: 8,  type: "teal",   label: "Reporting",        desc: "Weekly board review" },
+  c:   { cx: 560, cy: 68,  r: 10, type: "violet", label: "SOPs",             desc: "Written playbooks" },
+  d:   { cx: 64,  cy: 205, r: 8,  type: "teal",   label: "CRM Hygiene",      desc: "Clean records" },
+  e:   { cx: 500, cy: 175, r: 14, type: "accent", label: "Handoffs",         desc: "Clear ownership" },
+  f:   { cx: 680, cy: 200, r: 7,  type: "blue",   label: "Integrations",     desc: "Tools you already use" },
+  g:   { cx: 120, cy: 340, r: 9,  type: "amber",  label: "BPO Desks",        desc: "Staffed coverage" },
+  h:   { cx: 340, cy: 348, r: 11, type: "amber",  label: "Dispatch Board",   desc: "Loads & field jobs" },
+  i:   { cx: 590, cy: 330, r: 8,  type: "blue",   label: "Calendars",        desc: "Trade scheduling" },
+  j:   { cx: 700, cy: 88,  r: 7,  type: "teal",   label: "Shared Inbox",     desc: "Email & chat" },
 };
 
 const TS = {
@@ -54,10 +54,10 @@ const PACKETS = [
 ];
 
 const BADGES = [
-  { x: 28,  y: 108, label: "UPTIME",    value: "99.9%",   accent: "#00f5d4" },
-  { x: 560, y: 18,  label: "ACCURACY",  value: "97.4%",   accent: "#b38cff" },
-  { x: 548, y: 228, label: "RESPONSE",  value: "< 2 min", accent: "#7090e0" },
-  { x: 28,  y: 262, label: "OPS / DAY", value: "12K+",    accent: "#ffc53d" },
+  { x: 28,  y: 108, label: "FOCUS",     value: "Queues",   accent: "#00f5d4" },
+  { x: 560, y: 18,  label: "METHOD",    value: "SOPs",     accent: "#b38cff" },
+  { x: 548, y: 228, label: "OWNER",     value: "Named",    accent: "#7090e0" },
+  { x: 28,  y: 262, label: "COVERAGE",  value: "Remote",   accent: "#ffc53d" },
 ];
 
 const VB_W = 760;
@@ -84,16 +84,15 @@ export default function VideoSection() {
     <section className="video-section">
       <div className="video-copy">
         <Reveal>
-          <div className="section-label">03 — TECHNOLOGY IN MOTION</div>
-          <h2>Human operations.<br /><em>Tech-enabled.</em></h2>
+          <div className="section-label">03 · HOW THE DESK CONNECTS</div>
+          <h2>People on the board.<br /><em>Tools in support.</em></h2>
           <p>
-            Intelligent automation, AI models, and real-time analytics — wired
-            directly into your operations so your team focuses on decisions,
-            not data entry.
+            Spreadsheets, CRMs, dispatch apps, shared inboxes: we work inside what
+            you already run. The diagram is a map of handoffs, not a product pitch.
           </p>
           <div className="vnet-legend">
             <span className="vnet-legend-item">
-              <span className="vnet-legend-dot" style={{ background: "#5a3db0" }} />Core
+              <span className="vnet-legend-dot" style={{ background: "#5a3db0" }} />Desk
             </span>
             <span className="vnet-legend-item">
               <span className="vnet-legend-dot" style={{ background: "#00c8a8" }} />Data
@@ -105,7 +104,7 @@ export default function VideoSection() {
               <span className="vnet-legend-dot" style={{ background: "#00f5d4" }} />Flow
             </span>
           </div>
-          <p className="vnet-hint">Hover nodes to explore</p>
+          <p className="vnet-hint">Hover a node for the short version</p>
         </Reveal>
       </div>
 
@@ -117,7 +116,7 @@ export default function VideoSection() {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg"
-          aria-label="Interactive technology network diagram"
+          aria-label="Interactive operations handoff diagram"
         >
           <defs>
             <radialGradient id="vhub" cx="38%" cy="38%" r="62%">
@@ -176,7 +175,7 @@ export default function VideoSection() {
             const dimmed = edgeDimmed([s, e]);
             return (
               <g key={`${s}${e}`}>
-                {/* Base flowing dash — always present so SMIL doesn't restart */}
+                {/* Base flowing dash  -  always present so SMIL doesn't restart */}
                 <line
                   x1={NX[s].cx} y1={NX[s].cy}
                   x2={NX[e].cx} y2={NX[e].cy}
@@ -270,7 +269,7 @@ export default function VideoSection() {
             </g>
           ))}
 
-          {/* Tooltip layer — always on top of everything including badges */}
+          {/* Tooltip layer  -  always on top of everything including badges */}
           {hovered && (() => {
             const n = NX[hovered];
             const ttW = 126;
@@ -293,8 +292,8 @@ export default function VideoSection() {
         </svg>
 
         <div className="video-caption">
-          <span>INDIGO / DIGITAL OPERATIONS</span>
-          <span className="vcap-live"><span className="vcap-dot" />LIVE NETWORK</span>
+          <span>INDIGO / OPS MAP</span>
+          <span className="vcap-live"><span className="vcap-dot" />LIVE DIAGRAM</span>
         </div>
       </Reveal>
     </section>

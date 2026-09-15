@@ -3,13 +3,14 @@ import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, animate }
 
 const DURATION = 2.5;
 const EXIT_MS = 0.85;
-const FILL = "#1A1A1A";
-const WORDS = ["INSPIRE", "INNOVATE", "IMPACT"];
+const RING_FILL_COLOR = "#4b1596";
+const CHIP_FILL_COLOR = "#9a6ae0";
+const WORDS = ["STAFF", "COVER", "DELIVER"];
 
 /**
  * Exact 2D projection of public/models/logo.glb
- * — ring: outer R=0.907, inner R=0.618, open on the left (−90° → +90° via +X)
- * — chips 1–17: world centers & half-extents from the GLB
+ *  -  ring: outer R=0.907, inner R=0.618, open on the left (−90° → +90° via +X)
+ *  -  chips 1-17: world centers & half-extents from the GLB
  * viewBox maps world (−1..1) → (0..200), Y flipped for SVG.
  */
 const RING_FILL =
@@ -65,7 +66,7 @@ function IndigoMarkSvg({ progress }) {
       {/* Ring stroke draw (matches GLB ring thickness) */}
       <motion.path
         d={RING_STROKE}
-        stroke={FILL}
+        stroke={RING_FILL_COLOR}
         strokeWidth="28.9"
         strokeLinecap="butt"
         fill="none"
@@ -80,13 +81,13 @@ function IndigoMarkSvg({ progress }) {
       {/* Solid ring fill once stroke has mostly drawn */}
       <motion.path
         d={RING_FILL}
-        fill={FILL}
+        fill={RING_FILL_COLOR}
         initial={{ opacity: 0 }}
         animate={{ opacity: fillOpacity }}
         transition={{ duration: 0.04, ease: "linear" }}
       />
 
-      {/* Chips 1–17 — exact GLB positions / sizes */}
+      {/* Chips 1-17  -  exact GLB positions / sizes */}
       {CHIPS.map((chip) => (
         <motion.rect
           key={chip.i}
@@ -96,10 +97,10 @@ function IndigoMarkSvg({ progress }) {
           height={chip.s}
           rx={chip.rx}
           ry={chip.rx}
-          stroke={FILL}
+          stroke={CHIP_FILL_COLOR}
           strokeWidth="1.4"
           initial={{ pathLength: 0, fillOpacity: 0 }}
-          animate={{ pathLength: draw, fill: FILL, fillOpacity }}
+          animate={{ pathLength: draw, fill: CHIP_FILL_COLOR, fillOpacity }}
           transition={{ duration: 0.04, ease: "linear" }}
         />
       ))}

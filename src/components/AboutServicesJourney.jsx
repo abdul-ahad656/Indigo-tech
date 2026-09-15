@@ -197,7 +197,7 @@ export default function AboutServicesJourney() {
       );
       tl.to({}, { duration: 0.08 }, 0.92);
 
-      // Services panel slides left — next section revealed underneath
+      // Services panel slides left  -  next section revealed underneath
       if (exitTrack && exitPanel) {
         gsap.fromTo(
           exitPanel,
@@ -247,15 +247,15 @@ export default function AboutServicesJourney() {
 
         <div className="strip-services-stage">
           <div className="strip-intro">
-            <p className="strip-content-label">02 — Services</p>
+            <p className="strip-content-label">02 · Services</p>
             <h2 className="strip-content-title" id="services-heading">
-              Services that
+              Desks we
               <br />
-              <em>move</em> business.
+              <em>actually</em> run.
             </h2>
             <p className="strip-content-lede">
-              Offshoring, support, dispatch, scheduling, books and ecommerce, and operational work
-              delivered as dependable business support.
+              Offshoring, support, dispatch, trade scheduling, bookkeeping, and store ops.
+              Same idea each time: a staffed queue with a clear owner.
             </p>
           </div>
 

@@ -8,7 +8,7 @@ export default function Footer({ onNavigate }) {
         <img src="/assets/indigo-logo.jpg" alt="Indigo" />
         <span>{company.name}</span>
       </div>
-      <span>BPO · Logistics · Customer Experience · Business Growth</span>
+      <span>BPO · Dispatch · Support · Books</span>
       <button onClick={() => onNavigate("top")}><ArrowUp size={16} /> Back to top</button>
     </footer>
   );

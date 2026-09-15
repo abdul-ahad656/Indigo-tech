@@ -12,41 +12,41 @@ export const heroServices = [
     no: "01",
     icon: Users,
     title: "Offshoring / Outsourcing",
-    text: "Scale operations with trained remote teams instead of building a full in-house department. We set the process, staff the work, and keep delivery accountable from day one."
+    text: "You need coverage without standing up a full local team. We staff the desk, write the SOPs, and report against the same queue rules your managers already use."
   },
   {
     no: "02",
     icon: Headphones,
     title: "Customer Support",
-    text: "Inbound, outbound, chat and email support that stays on-brand and on-time. We handle tickets, follow-ups and customer conversations so your team can stay on growth work."
+    text: "Phone, chat, and email. We take the tickets, chase the follow-ups, and keep the tone close to how you already talk to customers."
   },
   {
     no: "03",
     icon: Route,
     title: "Dispatch Operations",
-    text: "Coordinate jobs, drivers, loads and field teams from one reliable desk. Live updates, tighter routing and fewer missed windows for companies that cannot afford delay."
+    text: "Jobs, drivers, loads, field techs: one desk watching the board. Fewer missed windows when someone is actually sitting on the exceptions."
   },
   {
     no: "04",
     icon: CalendarClock,
     title: "Scheduling for Service Companies",
-    text: "Book, confirm and reshuffle appointments for HVAC, plumbing, roofing and other trade businesses. Calendars stay full, technicians stay informed, and customers stay notified."
+    text: "HVAC, plumbing, roofing, and similar trades. We book, confirm, and reshuffle when a tech runs late so the calendar stays honest."
   },
   {
     no: "05",
     icon: Calculator,
     title: "Financial Management",
-    text: "Day-to-day bookkeeping and reporting in Zoho, QuickBooks and Xero. Invoices, reconciliations and clean books so you always know where the money sits."
+    text: "Day-to-day books in Zoho, QuickBooks, or Xero. Invoices, reconciliations, AR follow-ups: enough clarity that month-end is not a scramble."
   },
   {
     no: "06",
     icon: ShoppingBag,
     title: "Ecommerce Stores",
-    text: "We build and run ecommerce stores that can take orders. Catalog setup, checkout, customer handling and daily operations sit with one team from launch through live trading."
+    text: "Catalog, checkout, and the daily order desk after launch. We stay on the live store so product and ops are not two separate fires."
   }
 ];
 
-const heroWords = ["businesses.", "operations.", "outcomes."];
+const heroWords = ["desks.", "queues.", "handoffs."];
 const LIGHT = { wght: 250 };
 const HEAVY = { wght: 780 };
 
@@ -123,14 +123,14 @@ function HeroLockup() {
     >
       <VariableLine
         className="hero-lockup-line"
-        parts={[{ text: "Smart solutions." }]}
+        parts={[{ text: "Remote ops, done." }]}
         active={hot}
         from={LIGHT}
         to={HEAVY}
       />
       <span className="hero-lockup-line">
         <VariableLine
-          parts={[{ text: "Stronger " }]}
+          parts={[{ text: "Clearer " }]}
           active={hot}
           from={HEAVY}
           to={LIGHT}
@@ -155,20 +155,20 @@ function FillWords({ text }) {
 }
 
 const manifestoLines = [
-  "Indigo is an operations partner helping",
-  "businesses run smarter through people, process,",
-  "and technology."
+  "Indigo runs remote operations desks:",
+  "dispatch, support, scheduling, books,",
+  "so your in-house team is not buried in the queue."
 ];
 
 export function HeroImpact() {
   return (
     <div className="hero-scene hero-scene-impact" aria-hidden="true">
       <div className="hero-marquee">
-        <span>Operate + Support + Scale + Operate + Support + Scale +</span>
-        <span>Operate + Support + Scale + Operate + Support + Scale +</span>
+        <span>Dispatch + Support + Books + Dispatch + Support + Books +</span>
+        <span>Dispatch + Support + Books + Dispatch + Support + Books +</span>
       </div>
-      <p className="hero-impact-kicker">Focused vision. Measured execution.</p>
-      <p className="hero-impact-foot">From idea to outcome.</p>
+      <p className="hero-impact-kicker">SOPs first. Then people on the board.</p>
+      <p className="hero-impact-foot">Handoffs you can audit.</p>
     </div>
   );
 }
@@ -238,7 +238,7 @@ export default function HeroPinStory({ onContact, onAbout }) {
         <div className="hero-intro-copy">
           <HeroLockup />
           <button type="button" className="hero-cta" onClick={onContact}>
-            Discuss your project <ArrowUpRight size={14} />
+            Talk about your desk <ArrowUpRight size={14} />
           </button>
         </div>
         <button type="button" className="hero-scroll" onClick={onAbout}>
@@ -257,10 +257,10 @@ export default function HeroPinStory({ onContact, onAbout }) {
       </div>
 
       <div className="hero-scene hero-scene-about">
-        <p className="hero-about-left">We design for longevity. Clarity first, craft always, built to scale.</p>
+        <p className="hero-about-left">We write the process before we hire the seat. Otherwise the desk drifts.</p>
         <p className="hero-about-right">
-          Our mission is to make operations feel human by delivering support that is
-          reliable, purposeful, and meaningful to growing teams.
+          Most of the work is unglamorous: tickets answered, loads updated, invoices chased.
+          That is the point. Steady coverage beats a slide deck.
         </p>
       </div>
     </div>
