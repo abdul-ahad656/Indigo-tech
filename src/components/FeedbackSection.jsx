@@ -170,7 +170,7 @@ function TestimonialCard({
               aria-hidden="true"
             >
               <div
-                className="grid h-10 w-10 place-items-center rounded-full font-display text-[12px] font-semibold text-[#09090B]"
+                className="grid h-10 w-10 place-items-center rounded-full font-display text-[12px] font-semibold text-[#2e2660]"
                 style={{ background: item.accent }}
               >
                 {item.initials}
@@ -243,7 +243,7 @@ export default function FeedbackSection() {
   return (
     <section
       id="feedback"
-      className="testimonials-section relative overflow-hidden bg-[#09090B] px-[5vw] py-[100px] text-[#FAFAFA] md:py-[120px]"
+      className="testimonials-section relative overflow-hidden bg-[#2e2660] px-[5vw] py-[100px] text-[#F3EFFF] md:py-[120px]"
       aria-labelledby="testimonials-heading"
     >
       <div className="testimonials-mesh pointer-events-none absolute inset-0 opacity-80" aria-hidden="true" />
@@ -285,7 +285,7 @@ export default function FeedbackSection() {
                   onClick={() => setFilter(category)}
                   className={`rounded-full px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00F5D4] ${
                     active
-                      ? "bg-white text-[#09090B]"
+                      ? "bg-white text-[#2e2660]"
                       : "text-[#A1A1AA] hover:text-[#FAFAFA]"
                   }`}
                 >
@@ -306,7 +306,7 @@ export default function FeedbackSection() {
         >
           {desktop && hint.show && !reduceMotion && (
             <div
-              className="pointer-events-none absolute z-[100] hidden -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#09090B]/85 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#E4E4E7] shadow-lg backdrop-blur-md md:block"
+              className="pointer-events-none absolute z-[100] hidden -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#2e2660]/90 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#E4E4E7] shadow-lg backdrop-blur-md md:block"
               style={{ left: hint.x, top: hint.y }}
               aria-hidden="true"
             >
