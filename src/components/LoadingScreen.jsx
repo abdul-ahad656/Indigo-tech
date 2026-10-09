@@ -177,7 +177,7 @@ export default function LoadingScreen({ onComplete }) {
           role="status"
           aria-live="polite"
           aria-label={`Loading ${formatPct(pct)} percent`}
-          className="fixed inset-0 z-[300] flex touch-none items-center justify-center bg-[#E5E5E5]"
+          className="fixed inset-0 z-[300] flex touch-none items-center justify-center bg-[#F7F5EF]"
           initial={{ opacity: 1, y: 0 }}
           animate={
             exiting

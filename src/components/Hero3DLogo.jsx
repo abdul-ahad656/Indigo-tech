@@ -3,20 +3,9 @@
 import React, { Component, Suspense, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, useProgress } from "@react-three/drei";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 
 const MODEL_PATH = "/models/logo.glb";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-function rand(seed) {
-  const n = Math.sin(seed * 9999.12) * 43758.5453;
-  return n - Math.floor(n);
-}
 
 class HeroErrorBoundary extends Component {
   constructor(props) {
@@ -75,7 +64,7 @@ function Lights() {
   );
 }
 
-function IndigoMark({ triggerRef, onReady }) {
+function IndigoMark({ onReady }) {
   const { scene } = useGLTF(MODEL_PATH);
   const { viewport } = useThree();
   const spinRef = useRef(null);
@@ -111,133 +100,6 @@ function IndigoMark({ triggerRef, onReady }) {
     group.rotation.y += delta * 0.22;
   });
 
-  useLayoutEffect(() => {
-    const trigger = triggerRef?.current;
-    if (!trigger || !mark) return;
-
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const chipsGroup = mark.getObjectByName("chips");
-    const ring = mark.getObjectByName("ring");
-    const originals = [];
-
-    const ctx = gsap.context(() => {
-      if (prefersReduced) return;
-
-      const chips = [];
-      if (chipsGroup) {
-        for (let i = 1; i <= 17; i += 1) {
-          const named = chipsGroup.getObjectByName(`chip-${i}`);
-          if (named) chips.push(named);
-        }
-        if (!chips.length) {
-          chipsGroup.traverse((child) => {
-            if (child.isMesh) chips.push(child);
-          });
-        }
-      }
-
-      chips.forEach((chip, i) => {
-        let dx = chip.position.x;
-        let dy = chip.position.y;
-        let dz = chip.position.z;
-        const len = Math.hypot(dx, dy, dz);
-        if (len < 1e-6) {
-          dx = rand(i + 1) - 0.5;
-          dy = rand(i + 7) - 0.5;
-          dz = 0.4;
-        }
-        const inv = 1 / Math.hypot(dx, dy, dz);
-        dx *= inv;
-        dy *= inv;
-        dz *= inv;
-        const dist = 1.55 + rand(i + 21) * 1.9;
-
-        originals.push({
-          type: "chip",
-          mesh: chip,
-          x: chip.position.x,
-          y: chip.position.y,
-          z: chip.position.z,
-          rx: chip.rotation.x,
-          ry: chip.rotation.y,
-          rz: chip.rotation.z,
-          ex: chip.position.x + dx * dist,
-          ey: chip.position.y + dy * dist,
-          ez: chip.position.z + dz * dist + (rand(i + 33) - 0.32) * 1.7,
-        });
-      });
-
-      let ringState = null;
-      if (ring) {
-        ringState = {
-          type: "ring",
-          mesh: ring,
-          sx: ring.scale.x,
-          sy: ring.scale.y,
-          sz: ring.scale.z,
-        };
-        originals.push(ringState);
-      }
-
-      const restore = () => {
-        originals.forEach((orig) => {
-          if (orig.type === "chip") orig.mesh.position.set(orig.x, orig.y, orig.z);
-          if (orig.type === "ring") orig.mesh.scale.set(orig.sx, orig.sy, orig.sz);
-        });
-      };
-
-      const apply = (t) => {
-        const burst = Math.sin(Math.PI * t);
-        const k = burst * burst * (3 - 2 * burst);
-
-        originals.forEach((orig) => {
-          if (orig.type !== "chip") return;
-          orig.mesh.position.set(
-            orig.x + (orig.ex - orig.x) * k,
-            orig.y + (orig.ey - orig.y) * k,
-            orig.z + (orig.ez - orig.z) * k
-          );
-        });
-
-        if (ringState) {
-          const s = 1 + 0.1 * k;
-          ringState.mesh.scale.set(ringState.sx * s, ringState.sy * s, ringState.sz * s);
-        }
-      };
-
-      const progress = { t: 0 };
-      const stack = document.querySelector(".page-stack");
-      gsap.to(progress, {
-        t: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger,
-          start: "top top",
-          endTrigger: stack || trigger,
-          end: stack ? "top top" : "bottom top",
-          scrub: 1.1,
-          onUpdate: (self) => apply(Math.min(1, self.progress / 0.68)),
-          onLeave: restore,
-          onEnterBack: () => apply(1),
-        },
-      });
-    }, trigger);
-
-    const onResize = () => ScrollTrigger.refresh();
-    window.addEventListener("resize", onResize);
-    const refreshId = requestAnimationFrame(() => ScrollTrigger.refresh());
-
-    return () => {
-      cancelAnimationFrame(refreshId);
-      window.removeEventListener("resize", onResize);
-      ctx.revert();
-      originals.forEach((orig) => {
-        if (orig.type === "chip") orig.mesh.position.set(orig.x, orig.y, orig.z);
-        if (orig.type === "ring") orig.mesh.scale.set(orig.sx, orig.sy, orig.sz);
-      });
-    };
-  }, [mark, triggerRef]);
-
   return (
     <group ref={spinRef} scale={scale} position={[0, 0, 0]}>
       <primitive object={mark} />
@@ -245,11 +107,11 @@ function IndigoMark({ triggerRef, onReady }) {
   );
 }
 
-function Scene({ triggerRef, onReady }) {
+function Scene({ onReady }) {
   return (
     <>
       <Lights />
-      <IndigoMark triggerRef={triggerRef} onReady={onReady} />
+      <IndigoMark onReady={onReady} />
     </>
   );
 }
@@ -280,16 +142,14 @@ function HeroGuides() {
   );
 }
 
-export default function Hero3DLogo({ children, back }) {
-  const sectionRef = useRef(null);
+export default function Hero3DLogo({ children }) {
   const [ready, setReady] = useState(false);
   const onReady = React.useCallback(() => setReady(true), []);
 
   return (
-    <section ref={sectionRef} className="hero hero-3d" aria-label="Indigo 3D mark">
+    <section className="hero hero-3d" aria-label="Indigo 3D mark">
       <div className="hero-3d-stage">
         <div className="hero-3d-frame">
-          {back}
           <HeroGuides />
 
           <HeroErrorBoundary fallback={<FallbackMark />}>
@@ -303,7 +163,7 @@ export default function Hero3DLogo({ children, back }) {
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", background: "transparent" }}
               >
                 <Suspense fallback={null}>
-                  <Scene triggerRef={sectionRef} onReady={onReady} />
+                  <Scene onReady={onReady} />
                 </Suspense>
               </Canvas>
               {!ready && <LoaderOverlay />}

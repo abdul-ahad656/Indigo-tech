@@ -1,11 +1,5 @@
-import React, { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React from "react";
 import { ArrowUpRight, Calculator, CalendarClock, Headphones, Route, ShoppingBag, Users } from "lucide-react";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 export const heroServices = [
   {
@@ -142,126 +136,16 @@ function HeroLockup() {
   );
 }
 
-function FillWords({ text }) {
-  return text.split(/(\s+)/).map((chunk, i) =>
-    /^\s+$/.test(chunk) ? (
-      chunk
-    ) : (
-      <span key={i} className="hero-fill-word">
-        {chunk}
-      </span>
-    )
-  );
-}
-
-const manifestoLines = [
-  "Indigo runs remote operations desks:",
-  "dispatch, support, scheduling, books,",
-  "so your in-house team is not buried in the queue."
-];
-
-export function HeroImpact() {
+export default function HeroPinStory({ onContact }) {
   return (
-    <div className="hero-scene hero-scene-impact" aria-hidden="true">
-      <div className="hero-marquee">
-        <span>Dispatch + Support + Books + Dispatch + Support + Books +</span>
-        <span>Dispatch + Support + Books + Dispatch + Support + Books +</span>
-      </div>
-      <p className="hero-impact-kicker">SOPs first. Then people on the board.</p>
-      <p className="hero-impact-foot">Handoffs you can audit.</p>
-    </div>
-  );
-}
-
-export default function HeroPinStory({ onContact, onAbout }) {
-  const rootRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const trigger = document.querySelector(".hero-3d");
-    const root = rootRef.current;
-    if (!trigger || !root) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const q = gsap.utils.selector(root);
-    const ctx = gsap.context(() => {
-      const intro = q(".hero-scene-intro");
-      const manifesto = q(".hero-scene-manifesto");
-      const about = q(".hero-scene-about");
-      const fillWords = q(".hero-fill-word");
-      const impact = document.querySelector(".hero-scene-impact");
-
-      const vh = window.innerHeight;
-      const theme = getComputedStyle(document.querySelector(".hero-3d-frame") || document.documentElement);
-      const fillIdle = theme.getPropertyValue("--text-tertiary").trim() || "#8e86a8";
-      const fillActive = theme.getPropertyValue("--text-brand").trim() || "#b38cff";
-      gsap.set(manifesto, { y: 0 });
-      gsap.set(about, { y: vh * 1.15 });
-      gsap.set(fillWords, { color: fillIdle, fontWeight: 200 });
-      if (impact) gsap.set(impact, { y: vh * 1.05, autoAlpha: 0.15 });
-
-      const stack = document.querySelector(".page-stack");
-      const tl = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: {
-          trigger,
-          start: "top top",
-          endTrigger: stack || trigger,
-          end: stack ? "top top" : "bottom top",
-          scrub: 0.45
-        }
-      });
-
-      tl.to(intro, { y: -vh, duration: 0.12 }, 0);
-      tl.to(manifesto, { y: -vh, duration: 0.14 }, 0);
-      tl.to(fillWords, {
-        color: fillActive,
-        fontWeight: 800,
-        stagger: { each: 0.01, from: "start" },
-        duration: 0.06,
-        ease: "none"
-      }, 0.08);
-      tl.to(manifesto, { y: -vh * 2, duration: 0.12 }, 0.22);
-      tl.to(about, { y: 0, duration: 0.12 }, 0.22);
-      tl.to(about, { y: -vh, duration: 0.12 }, 0.36);
-      if (impact) {
-        tl.to(impact, { y: 0, autoAlpha: 1, duration: 0.12 }, 0.36);
-      }
-      tl.to({}, { duration: 0.55 }, 0.48);
-    }, root);
-
-    return () => ctx.revert();
-  }, []);
-
-  return (
-    <div ref={rootRef} className="hero-overlay">
+    <div className="hero-overlay">
       <div className="hero-scene hero-scene-intro">
         <div className="hero-intro-copy">
           <HeroLockup />
           <button type="button" className="hero-cta" onClick={onContact}>
-            Talk about your desk <ArrowUpRight size={14} />
+            Start your desk <ArrowUpRight size={14} />
           </button>
         </div>
-        <button type="button" className="hero-scroll" onClick={onAbout}>
-          Scroll
-        </button>
-      </div>
-
-      <div className="hero-scene hero-scene-manifesto">
-        <p>
-          {manifestoLines.map((line) => (
-            <span key={line} className="hero-fill-line">
-              <FillWords text={line} />
-            </span>
-          ))}
-        </p>
-      </div>
-
-      <div className="hero-scene hero-scene-about">
-        <p className="hero-about-left">We write the process before we hire the seat. Otherwise the desk drifts.</p>
-        <p className="hero-about-right">
-          Most of the work is unglamorous: tickets answered, loads updated, invoices chased.
-          That is the point. Steady coverage beats a slide deck.
-        </p>
       </div>
     </div>
   );

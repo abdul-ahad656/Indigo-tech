@@ -20,14 +20,14 @@ const TS = {
   accent: { fill: "url(#vacc)", stroke: "#c4a3ff", hstroke: "#e0c8ff", filter: "url(#vglow)"    },
   violet: { fill: "#e4dcff",    stroke: "#9070e0", hstroke: "#c4a3ff", filter: "url(#vglow-sm)" },
   teal:   { fill: "#c8f5ee",    stroke: "#00c8a8", hstroke: "#00f5d4", filter: "url(#vglow-sm)" },
-  amber:  { fill: "#fff4cc",    stroke: "#d4a800", hstroke: "#ffc53d", filter: "url(#vglow-sm)" },
+  amber:  { fill: "#e4dcff",    stroke: "#9070e0", hstroke: "#c4a3ff", filter: "url(#vglow-sm)" },
   blue:   { fill: "#d8e4ff",    stroke: "#7090e0", hstroke: "#90b4ff", filter: "url(#vglow-sm)" },
 };
 
 const ACCENT_COLOR = {
   hub: "#b38cff", accent: "#c4a3ff",
   violet: "#b38cff", teal: "#00f5d4",
-  amber: "#ffc53d", blue: "#90b4ff",
+  amber: "#b38cff", blue: "#90b4ff",
 };
 
 const EDGES = [
@@ -46,10 +46,10 @@ const PACKETS = [
   { id: "p1", s: "hub", e: "a", dur: "3s",   begin: "0s",   color: "#b38cff" },
   { id: "p2", s: "hub", e: "b", dur: "4s",   begin: "1.3s", color: "#00f5d4" },
   { id: "p3", s: "hub", e: "e", dur: "2.6s", begin: "0.6s", color: "#c4a3ff" },
-  { id: "p4", s: "hub", e: "h", dur: "3.7s", begin: "1.8s", color: "#ffc53d" },
+  { id: "p4", s: "hub", e: "h", dur: "3.7s", begin: "1.8s", color: "#b38cff" },
   { id: "p5", s: "e",   e: "c", dur: "4.3s", begin: "0.9s", color: "#b38cff" },
   { id: "p6", s: "e",   e: "i", dur: "5.1s", begin: "2.2s", color: "#90b4ff" },
-  { id: "p7", s: "h",   e: "g", dur: "4.8s", begin: "2.5s", color: "#ffc53d" },
+  { id: "p7", s: "h",   e: "g", dur: "4.8s", begin: "2.5s", color: "#5a3db0" },
   { id: "p8", s: "c",   e: "j", dur: "5.5s", begin: "1.5s", color: "#00f5d4" },
 ];
 
@@ -57,7 +57,7 @@ const BADGES = [
   { x: 28,  y: 108, label: "FOCUS",     value: "Queues",   accent: "#00f5d4" },
   { x: 560, y: 18,  label: "METHOD",    value: "SOPs",     accent: "#b38cff" },
   { x: 548, y: 228, label: "OWNER",     value: "Named",    accent: "#7090e0" },
-  { x: 28,  y: 262, label: "COVERAGE",  value: "Remote",   accent: "#ffc53d" },
+  { x: 28,  y: 262, label: "COVERAGE",  value: "Remote",   accent: "#b38cff" },
 ];
 
 const VB_W = 760;
@@ -68,7 +68,7 @@ const PARTICLES = Array.from({ length: 24 }, (_, i) => ({
   cx: 24 + (i * 37 + i * i * 5) % (VB_W - 48),
   y0: 36 + (i * 47 + i * 19) % (VB_H - 70),
   r: 1 + (i % 3) * 0.65,
-  color: ["#b38cff","#00f5d4","#ffc53d","#90b4ff"][i % 4],
+  color: ["#b38cff","#00f5d4","#5a3db0","#90b4ff"][i % 4],
   dur: `${11 + (i % 5) * 2.4}s`,
   delay: `${(i * 1.15) % 11}s`,
 }));
@@ -84,7 +84,7 @@ export default function VideoSection() {
     <section className="video-section">
       <div className="video-copy">
         <Reveal>
-          <div className="section-label">03 · HOW THE DESK CONNECTS</div>
+          <div className="section-label">03 / HOW THE DESK CONNECTS</div>
           <h2>People on the board.<br /><em>Tools in support.</em></h2>
           <p>
             Spreadsheets, CRMs, dispatch apps, shared inboxes: we work inside what
@@ -92,16 +92,16 @@ export default function VideoSection() {
           </p>
           <div className="vnet-legend">
             <span className="vnet-legend-item">
-              <span className="vnet-legend-dot" style={{ background: "#5a3db0" }} />Desk
+              <span className="vnet-legend-dot" style={{ background: "#101d46" }} />Desk
             </span>
             <span className="vnet-legend-item">
-              <span className="vnet-legend-dot" style={{ background: "#00c8a8" }} />Data
+              <span className="vnet-legend-dot" style={{ background: "#2bb8a0" }} />Data
             </span>
             <span className="vnet-legend-item">
-              <span className="vnet-legend-dot" style={{ background: "#d4a800" }} />Ops
+              <span className="vnet-legend-dot" style={{ background: "#b38cff" }} />Ops
             </span>
             <span className="vnet-legend-item">
-              <span className="vnet-legend-dot" style={{ background: "#00f5d4" }} />Flow
+              <span className="vnet-legend-dot" style={{ background: "#172858" }} />Flow
             </span>
           </div>
           <p className="vnet-hint">Hover a node for the short version</p>
@@ -164,7 +164,7 @@ export default function VideoSection() {
             <animateMotion dur="8s" repeatCount="indefinite"
               path={`M ${NX.hub.cx + 32},${NX.hub.cy} a 32,32 0 0,1 -64,0 a 32,32 0 0,1 64,0`} />
           </circle>
-          <circle r="3" fill="#ffc53d" filter="url(#vglow-sm)">
+          <circle r="3" fill="#b38cff" filter="url(#vglow-sm)">
             <animateMotion dur="14s" begin="-4s" repeatCount="indefinite"
               path={`M ${NX.hub.cx + 54},${NX.hub.cy} a 54,54 0 0,0 -108,0 a 54,54 0 0,0 108,0`} />
           </circle>

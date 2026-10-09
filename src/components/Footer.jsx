@@ -1,15 +1,19 @@
-import { ArrowUp } from "lucide-react";
 import { company } from "../data/site";
 
 export default function Footer({ onNavigate }) {
   return (
     <footer>
       <div className="footer-brand">
-        <img src="/assets/indigo-logo.jpg" alt="Indigo" />
-        <span>{company.name}</span>
+        <img src="/assets/indigo-logo.jpg" alt="" />
+        <span>
+          {company.name}
+          <small>BPO · DISPATCH · SUPPORT</small>
+        </span>
       </div>
-      <span>BPO · Dispatch · Support · Books</span>
-      <button onClick={() => onNavigate("top")}><ArrowUp size={16} /> Back to top</button>
+      <p>© {new Date().getFullYear()} Indigo Tech Solutions. All rights reserved.</p>
+      <button type="button" onClick={() => onNavigate("top")}>
+        Back to top ↑
+      </button>
     </footer>
   );
 }

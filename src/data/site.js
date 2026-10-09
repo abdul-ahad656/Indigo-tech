@@ -71,7 +71,7 @@ export const feedback = [
     company: "Harbor & Pine Commerce",
     verified: false,
     initials: "RM",
-    accent: "#00F5D4",
+    accent: "#2BB8A0",
     metric: "Inbox backlog cleared",
     tag: "Support",
     quote:
@@ -86,7 +86,7 @@ export const feedback = [
     company: "Westbridge Systems",
     verified: false,
     initials: "JC",
-    accent: "#00F5D4",
+    accent: "#2BB8A0",
     metric: "Faster first response",
     tag: "Tier-1",
     quote:
@@ -101,7 +101,7 @@ export const feedback = [
     company: "Redwood Supply Group",
     verified: false,
     initials: "LB",
-    accent: "#FFC53D",
+    accent: "#5A3DB0",
     metric: "Faster AR chase",
     tag: "AR",
     quote:
@@ -116,7 +116,7 @@ export const feedback = [
     company: "Cedar Grove Labs",
     verified: false,
     initials: "AT",
-    accent: "#FFC53D",
+    accent: "#5A3DB0",
     metric: "Cleaner CRM",
     tag: "Remote Desk",
     quote:
@@ -131,7 +131,7 @@ export const feedback = [
     company: "Brightwell Ventures",
     verified: false,
     initials: "SW",
-    accent: "#FFC53D",
+    accent: "#5A3DB0",
     metric: "Cleaner books",
     tag: "Books",
     quote:

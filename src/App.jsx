@@ -1,7 +1,6 @@
 import React from "react";
-import { motion, useScroll } from "framer-motion";
 import Hero3DLogo from "./components/Hero3DLogo";
-import HeroPinStory, { HeroImpact } from "./components/HeroPinStory";
+import HeroPinStory from "./components/HeroPinStory";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import AboutServicesJourney from "./components/AboutServicesJourney";
@@ -9,19 +8,31 @@ import FeedbackSection from "./components/FeedbackSection";
 import ContactSection from "./components/ContactSection";
 
 export default function App() {
-  const { scrollYProgress } = useScroll();
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const [onPage, setOnPage] = React.useState(false);
+  const glowRef = React.useRef(null);
 
   React.useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 24);
-      setOnPage(window.scrollY > window.innerHeight * 2.35);
+      setOnPage(window.scrollY > window.innerHeight * 0.55);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  React.useEffect(() => {
+    const glow = glowRef.current;
+    if (!glow) return undefined;
+    if (window.matchMedia("(pointer: coarse)").matches) return undefined;
+    const onMove = (e) => {
+      glow.style.left = `${e.clientX}px`;
+      glow.style.top = `${e.clientY}px`;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
   }, []);
 
   React.useEffect(() => {
@@ -40,13 +51,13 @@ export default function App() {
 
   return (
     <div className="site">
-      <motion.div className="progress" style={{ scaleX: scrollYProgress }} />
+      <div className="cursor-glow" ref={glowRef} aria-hidden="true" />
 
       <Nav scrolled={scrolled} open={open} setOpen={setOpen} onNavigate={go} onPage={onPage} />
 
       <main id="top">
-        <Hero3DLogo back={<HeroImpact />}>
-          <HeroPinStory onContact={() => go("contact")} onAbout={() => go("about")} />
+        <Hero3DLogo>
+          <HeroPinStory onContact={() => go("contact")} />
         </Hero3DLogo>
 
         <div className="page-stack">

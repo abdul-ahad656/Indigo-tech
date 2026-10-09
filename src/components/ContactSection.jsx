@@ -1,28 +1,40 @@
-import { Clock3, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { company } from "../data/site";
 import Reveal from "./Reveal";
 
 export default function ContactSection() {
   return (
-    <section id="contact" className="section contact">
-      <div className="contact-card">
-        <div className="contact-glow" />
+    <section id="contact" className="contact section-light">
+      <div className="section-label">05 / START A DESK</div>
+      <div className="contact-grid">
         <Reveal>
-          <div className="section-label">05 · START A DESK</div>
-          <h2>Tell us what<br /><em>is breaking.</em></h2>
+          <p className="eyebrow">YOUR NEXT QUEUE STARTS HERE</p>
+          <h2>
+            Ready when
+            <br />
+            <em>you are.</em>
+          </h2>
           <p>
             Dispatch backlog, inbox pile-up, calendars slipping, books behind.
-            Email or call and we will say whether we can take the seat.
+            Tell us what is breaking and we will say whether we can take the seat.
           </p>
-          <div className="contact-actions">
-            <a className="primary" href={`mailto:${company.email}`}><Mail size={18} /> Email Indigo</a>
-            <a className="secondary dark-secondary" href={`tel:${company.phone}`}><Phone size={17} /> Call the desk</a>
+        </Reveal>
+
+        <Reveal delay={0.08} className="contact-panel">
+          <a className="contact-link" href={`tel:${company.phone}`}>
+            <span>Call</span>
+            <strong>{company.phone} ↗</strong>
+          </a>
+          <a className="contact-link" href={`mailto:${company.email}`}>
+            <span>Email</span>
+            <strong>{company.email} ↗</strong>
+          </a>
+          <div className="contact-link">
+            <span>Based in</span>
+            <strong>{company.location}</strong>
           </div>
-          <div className="contact-meta">
-            <span><MapPin size={16} /> {company.location}</span>
-            <span><Clock3 size={16} /> Remote coverage</span>
-            <span><ShieldCheck size={16} /> Named account lead</span>
-          </div>
+          <a className="primary button wide" href={`mailto:${company.email}`}>
+            Email Indigo <span>↗</span>
+          </a>
         </Reveal>
       </div>
     </section>

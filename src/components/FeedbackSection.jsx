@@ -47,7 +47,7 @@ function Stars({ rating }) {
           key={i}
           size={12}
           strokeWidth={1.6}
-          className={i < rating ? "fill-[#FFC53D] text-[#FFC53D]" : "text-white/20"}
+          className={i < rating ? "fill-[#B38CFF] text-[#B38CFF]" : "text-white/20"}
           aria-hidden="true"
         />
       ))}
@@ -78,13 +78,7 @@ function TestimonialCard({
       whileDrag={reduceMotion ? undefined : { scale: 1.05, zIndex: 50, cursor: "grabbing" }}
       onPointerDown={() => onFront(item.id)}
       onDragStart={() => onFront(item.id)}
-      initial={
-        reduceMotion
-          ? false
-          : desktop
-            ? { opacity: 0, scale: 0.88, rotate: layout.rotate - 10 }
-            : { opacity: 0, y: 28 }
-      }
+      initial={false}
       animate={
         desktop
           ? {
@@ -96,7 +90,7 @@ function TestimonialCard({
             }
           : { opacity: 1, y: 0 }
       }
-      exit={reduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
+      exit={false}
       transition={SPRING}
       className={`group select-none ${
         desktop
@@ -170,7 +164,7 @@ function TestimonialCard({
               aria-hidden="true"
             >
               <div
-                className="grid h-10 w-10 place-items-center rounded-full font-display text-[12px] font-semibold text-[#2e2660]"
+                className="grid h-10 w-10 place-items-center rounded-full font-display text-[12px] font-semibold text-[#07112d]"
                 style={{ background: item.accent }}
               >
                 {item.initials}
@@ -182,7 +176,7 @@ function TestimonialCard({
                   {item.person}
                 </strong>
                 {item.verified && (
-                  <BadgeCheck size={14} className="shrink-0 text-[#00F5D4]" aria-label="Verified" />
+                  <BadgeCheck size={14} className="shrink-0 text-[#B38CFF]" aria-label="Verified" />
                 )}
               </div>
               <span className="mt-0.5 block truncate font-mono text-[9px] uppercase tracking-[0.12em] text-[#71717A]">
@@ -243,7 +237,7 @@ export default function FeedbackSection() {
   return (
     <section
       id="feedback"
-      className="testimonials-section relative overflow-hidden bg-[#2e2660] px-[5vw] py-[100px] text-[#F3EFFF] md:py-[120px]"
+      className="testimonials-section relative overflow-hidden bg-[#07112d] px-[5vw] py-[72px] text-[#F7F5EF] sm:py-[100px] md:py-[120px]"
       aria-labelledby="testimonials-heading"
     >
       <div className="testimonials-mesh pointer-events-none absolute inset-0 opacity-80" aria-hidden="true" />
@@ -252,21 +246,17 @@ export default function FeedbackSection() {
       <div className="relative z-[1] mx-auto max-w-[1280px]">
         <div className="mb-8 flex flex-col gap-6 md:mb-10 md:flex-row md:items-end md:justify-between">
           <div className="max-w-[640px]">
-            <p className="mb-5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-[#71717A]">
-              04 · Client Feedback
+            <p className="mb-5 text-[9px] font-bold uppercase tracking-[0.22em] text-white/40">
+              04 / CLIENT FEEDBACK
             </p>
-            <motion.h2
+            <h2
               id="testimonials-heading"
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={SPRING}
-              className="font-display m-0 text-[clamp(2.2rem,10vw,4.8rem)] font-bold leading-[0.92] tracking-[-0.07em]"
+              className="font-display m-0 text-[clamp(2.2rem,10vw,4.8rem)] font-semibold leading-[0.92] tracking-[-0.055em]"
             >
               Quotes we will
               <br />
-              <em className="not-italic text-[#B38CFF]">publish for real</em>
-            </motion.h2>
+              <em className="italic font-medium text-[#B38CFF]" style={{ fontFamily: "var(--font-display)" }}>publish for real</em>
+            </h2>
           </div>
 
           <div
@@ -283,10 +273,10 @@ export default function FeedbackSection() {
                   role="tab"
                   aria-selected={active}
                   onClick={() => setFilter(category)}
-                  className={`rounded-full px-3 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00F5D4] sm:px-4 sm:tracking-[0.14em] ${
+                  className={`rounded-full px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B38CFF] sm:px-4 sm:tracking-[0.14em] ${
                     active
-                      ? "bg-white text-[#2e2660]"
-                      : "text-[#A1A1AA] hover:text-[#FAFAFA]"
+                      ? "bg-[#B38CFF] text-[#07112d]"
+                      : "text-white/50 hover:text-[#F7F5EF]"
                   }`}
                 >
                   {category}
@@ -306,7 +296,7 @@ export default function FeedbackSection() {
         >
           {desktop && hint.show && !reduceMotion && (
             <div
-              className="pointer-events-none absolute z-[100] hidden -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#2e2660]/90 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#E4E4E7] shadow-lg backdrop-blur-md md:block"
+              className="pointer-events-none absolute z-[100] hidden -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#07112d]/90 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F7F5EF] shadow-lg backdrop-blur-md md:block"
               style={{ left: hint.x, top: hint.y }}
               aria-hidden="true"
             >

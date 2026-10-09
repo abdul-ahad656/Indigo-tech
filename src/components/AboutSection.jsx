@@ -2,10 +2,16 @@ import Reveal from "./Reveal";
 
 export default function AboutSection() {
   return (
-    <section id="about" className="section about">
-      <div className="section-label">01 · THE COMPANY</div>
+    <section id="about" className="section about section-light">
+      <div className="section-label">01 / THE COMPANY</div>
       <div className="about-grid">
-        <Reveal className="sticky-title"><h2>Built to<br /><em>operate.</em></h2></Reveal>
+        <Reveal className="sticky-title">
+          <h2>
+            Built to
+            <br />
+            <em>operate.</em>
+          </h2>
+        </Reveal>
         <Reveal delay={0.08}>
           <p className="large-copy">
             Indigo Tech Solutions is a remote BPO shop. We sit on dispatch boards,
@@ -19,9 +25,18 @@ export default function AboutSection() {
             account so you are not guessing who owns the queue.
           </p>
           <div className="stat-row">
-            <div><strong>BPO</strong><span>Core desks</span></div>
-            <div><strong>Remote</strong><span>Delivery model</span></div>
-            <div><strong>Named</strong><span>Account lead</span></div>
+            <div>
+              <strong>BPO</strong>
+              <span>Core desks</span>
+            </div>
+            <div>
+              <strong>Remote</strong>
+              <span>Delivery model</span>
+            </div>
+            <div>
+              <strong>Named</strong>
+              <span>Account lead</span>
+            </div>
           </div>
         </Reveal>
       </div>
