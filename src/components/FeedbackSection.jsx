@@ -98,9 +98,9 @@ function TestimonialCard({
       }
       exit={reduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
       transition={SPRING}
-      className={`group touch-none select-none ${
+      className={`group select-none ${
         desktop
-          ? "absolute cursor-grab active:cursor-grabbing"
+          ? "absolute touch-none cursor-grab active:cursor-grabbing"
           : "relative w-full"
       }`}
       style={
@@ -261,7 +261,7 @@ export default function FeedbackSection() {
               whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={SPRING}
-              className="font-display m-0 text-[clamp(2.6rem,5.5vw,4.8rem)] font-bold leading-[0.92] tracking-[-0.07em]"
+              className="font-display m-0 text-[clamp(2.2rem,10vw,4.8rem)] font-bold leading-[0.92] tracking-[-0.07em]"
             >
               Quotes we will
               <br />
@@ -270,7 +270,7 @@ export default function FeedbackSection() {
           </div>
 
           <div
-            className="testimonials-dock flex flex-wrap gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-xl"
+            className="testimonials-dock flex w-full flex-wrap gap-2 rounded-[18px] border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-xl md:w-auto md:rounded-full"
             role="tablist"
             aria-label="Filter reviews by category"
           >
@@ -283,7 +283,7 @@ export default function FeedbackSection() {
                   role="tab"
                   aria-selected={active}
                   onClick={() => setFilter(category)}
-                  className={`rounded-full px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00F5D4] ${
+                  className={`rounded-full px-3 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00F5D4] sm:px-4 sm:tracking-[0.14em] ${
                     active
                       ? "bg-white text-[#2e2660]"
                       : "text-[#A1A1AA] hover:text-[#FAFAFA]"
